@@ -25,16 +25,27 @@ semester = 20243
 
 @dataclass
 class Section:
-    name: str
+    id_and_d_class_code: str
+    type: str
+    day: str
     time: str
+    loc: str
+    prof_name: str
+
+@dataclass
+class Course:
+    name: str
+    title: str
+    description: str
     units: str
+    sections: List[Section]
 
 def getDepartmentJsonString(department_id: str, semester_id: str) -> str:
     url = f"https://web-app.usc.edu/web/soc/api/classes/{department_id}/{semester_id}"
     response = requests.get(url)
     return response.text
 
-def createClassMapping(json_response: str) -> List[List[Section]]:
+def createClassMapping(json_response: str) -> List[Course]:
     try:
         data = json.loads(json_response)
     except json.JSONDecodeError as e:
@@ -45,10 +56,25 @@ def createClassMapping(json_response: str) -> List[List[Section]]:
     
     # for all courses from the 'OfferedCourses' section
     for course in data.get("OfferedCourses", {}).get("course", []):
+        if not isinstance(course, dict):
+            print(f"Warning: Invalid course data: {course}")
+            continue
         course_data = course.get("CourseData", {})
         
         # Course Name
         name = f"{course_data.get('prefix', '')}-{course_data.get('number', '')}"
+        # Get course title (ie, "Explorations in Computing")
+        title = course.get("title", '')
+        if (title == ''):
+            title = "N/A"
+        # Get course description
+        description = course.get("description", '')
+        if (description == ''):
+            description = "N/A"
+        # Get units for course (split from "4.0, 0" to "4.0")
+        units = (course.get("units", '')).split(",", 1)[0]
+        if (units == ''):
+            units = "N/A"
         
         # To hold all sections for a course
         sections = []
@@ -58,48 +84,90 @@ def createClassMapping(json_response: str) -> List[List[Section]]:
                 print(f"Warning: Invalid section data: {section_data}")
                 continue
 
+            id_and_d_class_code = f"{section_data.get('id', '')} {section_data.get('dclass_code', '')}"
+            if (id_and_d_class_code == ''):
+                id_and_d_class_code = "Unknown"
+
+            type = section_data.get('type', '')
+            if (type == ''):
+                type = "Unknown"
+            
+            day = section_data.get('day', '')
+            if (day == ''):
+                day = "Unknown"
+
             # Create the time string
             start_time = section_data.get('start_time', '')
             end_time = section_data.get('end_time', '')
             time = f"{start_time} - {end_time}"
+            if (time == ''):
+                time = "Unknown"
 
-            # Get units
-            units = section_data.get("units", "")
+            loc = section_data.get('location', '')
+            if (loc == ''):
+                loc = "Unknown"
+            
+            prof = section_data.get('instructor', {})
+            if isinstance(prof, dict) and 'first_name' in prof and 'last_name' in prof:
+                prof_name = f"{prof['last_name']}, {prof['first_name']}"
+            else:
+                prof_name = "Unknown"
             
             # Create section
             section = Section(
-                name=name,
+                id_and_d_class_code=id_and_d_class_code,
+                type=type,
+                day=day,
                 time=time,
-                units=units
+                loc=loc,
+                prof_name=prof_name
             )
             sections.append(section)
 
         # Append iff sections found
         if sections:
-            courses.append(sections)
+            course = Course(
+                name=name, 
+                title=title, 
+                description=description,
+                units=units,
+                sections=sections
+            )
+            courses.append(course)
     
     return courses
 
-def print_courses(courses: List[List[Section]]):
+def print_courses(courses: List[Course]):
     if not courses:
         print("No courses found.")
         return
 
-    for course_sections in courses:
-        print(f"Course sections:")
-        for section in course_sections:
-            print(f" Name: {section.name}")
-            print(f" Time: {section.time}")
-            print(f" Units: {section.units}")
-            print()
+    for course in courses:
+        print(f" Name: {course.name}")
+        print(f" Title: {course.title}")
+        print(f" Description: {course.description}")
+        print(f" Units: {course.units}")
+        print()
         print("-" * 50)
+        for section in course.sections:
+            print(f" ID: {section.id_and_d_class_code}")
+            print(f" Type: {section.type}")
+            print(f" Day: {section.day}")
+            print(f" Time: {section.time}")
+            print(f" Loc: {section.loc}")
+            print(f" Prof Name: {section.prof_name}")
+            print()
+            print("-" * 50)
 
 if __name__ == "__main__":
     try:
-        json_response = getDepartmentJsonString("CSCI", semester)
-        courses = createClassMapping(json_response)
-        print_courses(courses)
+        for department in departments:
+            json_response = getDepartmentJsonString(department, semester)
+            courses = createClassMapping(json_response)
+            print_courses(courses)
     except requests.RequestException as e:
         print(f"Error fetching data from API: {e}")
     except Exception as e:
+        import traceback
         print(f"Unexpected error: {e}")
+        print(f"Error occurred on line {traceback.extract_tb(e.__traceback__)[-1].lineno}")
