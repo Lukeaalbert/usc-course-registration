@@ -44,7 +44,8 @@ public class JDBC {
 	
 	private void populateDb(Course[] courses) {
 		try {
-			String create_courses_table = "CREATE TABLE courses( "
+			String sql;
+			sql = "CREATE TABLE courses( "
 					+ "id VARCHAR(255) PRIMARY KEY, "
 					+ "course_name VARCHAR(255), "
 					+ "course_title VARCHAR(255), "
@@ -56,11 +57,11 @@ public class JDBC {
 					+ "loc VARCHAR(255), "
 					+ "prof VARCHAR(255)) ";
 			
-			stmt.executeUpdate(create_courses_table);
+			stmt.executeUpdate(sql);
 			
 			for (Course course: courses) {
 				for (Section section: course.sections) {
-					String sql = "INSERT INTO courses ( "
+					sql = "INSERT INTO courses ( "
 							+ "id, "
 							+ "course_name, "
 							+ "course_title, "
@@ -83,6 +84,7 @@ public class JDBC {
 							+ section.loc + ", "
 							+ section.prof
 							+ ")";
+					stmt.executeUpdate(sql);
 				}
 			}
 		} catch (SQLException e) {
