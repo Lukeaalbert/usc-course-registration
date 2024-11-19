@@ -1,3 +1,4 @@
+package semester_SQL_creator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,12 +11,14 @@ import java.util.Vector;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-// Compile: javac -cp "lib/*" CourseInfoFinder.java
-// Run: java -cp ".;lib/*" CourseInfoFinder
+// Compile: javac -cp "semester_SQL_creator/lib/*" semester_SQL_creator/CourseInfoFinder.java
+// Run:
+// Windows: java -cp ".;semester_SQL_creator/lib/*" semester_SQL_creator.CourseInfoFinder
+// Mac/Linux: java -cp ".:semester_SQL_creator/lib/*" semester_SQL_creator.CourseInfoFinder
 
 public class CourseInfoFinder {
 
-    static String[] departments = new String[]{"AHIS", "ALI", "AMST", "ANTH", "ARAB", "ASTR", "BISC", "CHEM", "CLAS", "COLT", "CORE", "CSLC",
+    public static String[] departments = new String[]{"AHIS", "ALI", "AMST", "ANTH", "ARAB", "ASTR", "BISC", "CHEM", "CLAS", "COLT", "CORE", "CSLC",
                "EALC", "EASC", "ECON", "ENGL", "ENST", "FREN", "GEOG", "GEOL", "GERM", "SWMS", "GR", "HEBR",
                "HIST", "HBIO", "INDS", "IR", "IRAN", "ITAL", "JS", "LAT", "LING", "MATH", "MDA", "MDES", "MPW",
                "NEUR", "NSCI", "OS", "PHED", "PHIL", "PHYS", "POIR", "PORT", "POSC", "PSYC", "REL", "RNR",
@@ -33,9 +36,9 @@ public class CourseInfoFinder {
                "AEST", "HMGT", "MS", "NAUT", "NSC", "PPD", "PPDE", "PLUS", "RED"};
 
     // Note: 20243 = Fall 2024
-    static String semester = "20243";
+    public static String semester = "20243";
 
-    private static String getDepartmentJsonString(String department_id, String semester_id) throws Exception{
+    public static String getDepartmentJsonString(String department_id, String semester_id) throws Exception{
         try {
             String url_text = "https://web-app.usc.edu/web/soc/api/classes/" + department_id + "/" + semester_id;
             
@@ -169,14 +172,6 @@ public class CourseInfoFinder {
                     prof_name = "Unknown";
                 }
                 
-                
-
-                System.out.println(id_and_d_class_code);
-                System.out.println(type);
-                System.out.println(day);
-                System.out.println(time);
-                System.out.println(loc);
-                System.out.println(prof_name);
                 Section s = new Section(id_and_d_class_code, type, day, time, loc, prof_name);
                 (nameToCourse.get(name)).sections.addElement(s);
 
@@ -189,12 +184,10 @@ public class CourseInfoFinder {
             System.out.println(title);
             System.out.println(description);
             System.out.println(units);
-            */
-
-            
+            */      
         }
         
-        System.out.println();
+        // System.out.println();
         return courses;
     }
 
@@ -222,6 +215,7 @@ public class CourseInfoFinder {
         
     }
     
+    /*
     public static void main(String[] args){
         for(int i = 0; i < departments.length; i++){
             String department = departments[i];
@@ -235,8 +229,8 @@ public class CourseInfoFinder {
                 System.out.println("Error while fetching data for " + department + ": " + e.getMessage());
             }
         }
-        
     }
+    */
 }
 
 class Section{
