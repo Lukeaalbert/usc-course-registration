@@ -7,6 +7,11 @@ public class JDBC {
     private static Connection connection;
     private static Statement stmt;
 
+    // for authentication class to determine whether there is a connection
+    public boolean hasConnection() {
+    	return connection == null;
+    }
+
     public static void establishJDBCConnection(String username, String password) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
