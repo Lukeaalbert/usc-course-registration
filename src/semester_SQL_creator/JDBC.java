@@ -8,7 +8,7 @@ public class JDBC {
     private static Statement stmt;
 
     // for authentication class to determine whether there is a connection
-    public boolean hasConnection() {
+    public static boolean hasConnection() {
     	return connection != null;
     }
 
