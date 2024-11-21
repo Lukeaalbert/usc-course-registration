@@ -116,7 +116,7 @@ public class JDBC {
         populateDb(courses);
     }
 
-        // insert a user into database, assume users is a table with (id INT PRIMARY KEY, username VARCHAR(100), email VARCHAR(100), password VARCHAR(100))
+    // insert a user into database, assume users is a table with (id INT PRIMARY KEY, username VARCHAR(100), email VARCHAR(100), password VARCHAR(100))
     public static boolean insertUser(String username, String email, String password){
         try{
         	if(username.length() >= 100 || email.length() >= 100 || password.length() >= 100)
@@ -133,12 +133,12 @@ public class JDBC {
             if(rs.next())
             	max_idx = rs.getInt("m") + 1;
             
-            PreparedStatement insertIntoBase = connection.prepareStatement("INSERT INTO users(user_id, username, email, password) VALUES(?, ?, ?, ?)");
+            PreparedStatement insertIntoBase = connection.prepareStatement("INSERT INTO users(user_id, username, email, password) VALUES (?, ?, ?, ?);");
             insertIntoBase.setInt(1, max_idx);
             insertIntoBase.setString(2, username);
             insertIntoBase.setString(3, email);
             insertIntoBase.setString(4, password);
-            insertIntoBase.executeQuery();
+            insertIntoBase.execute();
             return true;
         } catch(SQLException sqle){
             System.out.println("SQL Error: " + sqle.getMessage());
@@ -157,13 +157,13 @@ public class JDBC {
     		return results;
     	}
     	try {
-    		PreparedStatement getUserByUsername = connection.prepareStatement("SELECT * FROM users WHERE username = ?)");
+    		PreparedStatement getUserByUsername = connection.prepareStatement("SELECT * FROM users WHERE username = ?;");
     		getUserByUsername.setString(1, username);
     		ResultSet rs = getUserByUsername.executeQuery();
         	if(!rs.next()) {
         		results.add("user doesn't exist!");
         	} else {
-        		results.add("" + rs.getInt("id"));
+        		results.add("" + rs.getInt("user_id"));
         		results.add(rs.getString("username"));
         		results.add(rs.getString("email"));
         		results.add(rs.getString("password"));
@@ -181,13 +181,13 @@ public class JDBC {
     public static Vector<String> getUser(int id){
     	Vector<String> results = new Vector<>();
     	try {
-    		PreparedStatement getUserByUsername = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?)");
+    		PreparedStatement getUserByUsername = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?;");
     		getUserByUsername.setInt(1, id);
     		ResultSet rs = getUserByUsername.executeQuery();
         	if(!rs.next()) {
         		results.add("user doesn't exist!");
         	} else {
-        		results.add("" + rs.getInt("id"));
+        		results.add("" + rs.getInt("user_id"));
         		results.add(rs.getString("username"));
         		results.add(rs.getString("email"));
         		results.add(rs.getString("password"));
@@ -199,5 +199,35 @@ public class JDBC {
     	}
     	results.add("an unknown error happened!");
 		return results;
+    }
+    
+    // return whether delete is successful
+    public static boolean dropUser(String username) {
+    	try {
+    		PreparedStatement getUserByUsername = connection.prepareStatement("DELETE FROM users WHERE username = ?;");
+    		getUserByUsername.setString(1, username);
+    		getUserByUsername.execute();
+        	return true;
+    	} catch(Exception e) {
+    		System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
+    	}
+    	
+		return false;
+    }
+    
+    // overload, delete by id
+    public static boolean dropUser(int id) {
+    	try {
+    		PreparedStatement getUserByUsername = connection.prepareStatement("DELETE FROM users WHERE user_id = ?;");
+    		getUserByUsername.setInt(1, id);
+    		getUserByUsername.execute();
+        	return true;
+    	} catch(Exception e) {
+    		System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
+    	}
+    	
+		return false;
     }
 }
