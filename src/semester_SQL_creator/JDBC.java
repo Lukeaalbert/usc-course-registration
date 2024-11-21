@@ -9,7 +9,7 @@ public class JDBC {
 
     // for authentication class to determine whether there is a connection
     public boolean hasConnection() {
-    	return connection == null;
+    	return connection != null;
     }
 
     public static void establishJDBCConnection(String username, String password) {
