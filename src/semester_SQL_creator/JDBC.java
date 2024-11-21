@@ -115,4 +115,89 @@ public class JDBC {
         createDb(databaseName);
         populateDb(courses);
     }
+
+        // insert a user into database, assume users is a table with (id INT PRIMARY KEY, username VARCHAR(100), email VARCHAR(100), password VARCHAR(100))
+    public static boolean insertUser(String username, String email, String password){
+        try{
+        	if(username.length() >= 100 || email.length() >= 100 || password.length() >= 100)
+        		return false;
+        	
+        	if(getUser(username).size() > 1) // a user exists
+        		return false;
+        	
+            PreparedStatement getMaxID = connection.prepareStatement("SELECT MAX(user_id) AS m FROM users;");
+            ResultSet rs = getMaxID.executeQuery();
+            int max_idx = 1;
+            // get max index and add one for new id
+            // if result set empty, meaning table is none, then let index be 1
+            if(rs.next())
+            	max_idx = rs.getInt("m") + 1;
+            
+            PreparedStatement insertIntoBase = connection.prepareStatement("INSERT INTO users(user_id, username, email, password) VALUES(?, ?, ?, ?)");
+            insertIntoBase.setInt(1, max_idx);
+            insertIntoBase.setString(2, username);
+            insertIntoBase.setString(3, email);
+            insertIntoBase.setString(4, password);
+            insertIntoBase.executeQuery();
+            return true;
+        } catch(SQLException sqle){
+            System.out.println("SQL Error: " + sqle.getMessage());
+            sqle.printStackTrace();
+        }
+        return false;
+    }
+    
+    // get information for user providing username
+    // if exists: "id", "username", "email", "password"
+    // if an error occurs, result a vector of single String
+    public static Vector<String> getUser(String username){
+    	Vector<String> results = new Vector<>();
+    	if(username.length() >= 100) {
+    		results.add("user doesn't exist!");
+    		return results;
+    	}
+    	try {
+    		PreparedStatement getUserByUsername = connection.prepareStatement("SELECT * FROM users WHERE username = ?)");
+    		getUserByUsername.setString(1, username);
+    		ResultSet rs = getUserByUsername.executeQuery();
+        	if(!rs.next()) {
+        		results.add("user doesn't exist!");
+        	} else {
+        		results.add("" + rs.getInt("id"));
+        		results.add(rs.getString("username"));
+        		results.add(rs.getString("email"));
+        		results.add(rs.getString("password"));
+        	}
+        	return results;
+    	} catch(Exception e) {
+    		System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
+    	}
+    	results.add("an unknown error happened!");
+		return results;
+    }
+    
+    // overload: get user by id
+    public static Vector<String> getUser(int id){
+    	Vector<String> results = new Vector<>();
+    	try {
+    		PreparedStatement getUserByUsername = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?)");
+    		getUserByUsername.setInt(1, id);
+    		ResultSet rs = getUserByUsername.executeQuery();
+        	if(!rs.next()) {
+        		results.add("user doesn't exist!");
+        	} else {
+        		results.add("" + rs.getInt("id"));
+        		results.add(rs.getString("username"));
+        		results.add(rs.getString("email"));
+        		results.add(rs.getString("password"));
+        	}
+        	return results;
+    	} catch(Exception e) {
+    		System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
+    	}
+    	results.add("an unknown error happened!");
+		return results;
+    }
 }
