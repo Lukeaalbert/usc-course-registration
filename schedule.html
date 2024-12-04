@@ -10,14 +10,17 @@
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start;
+            overflow-y: auto;
         }
+
         .container {
             display: flex;
             width: 1200px;
+            margin: 20px 0;
         }
         .form-container {
             width: 300px;
@@ -109,7 +112,15 @@
             margin-left: 20px;
         }
         .day-section h4 {
+            margin-left: 20%;
+            margin-right: 15%;
+            background-color: #dad9d9;
+            border: 1px solid black;
             cursor: pointer;
+        }
+        .day-section h4:hover {
+            background-color: #f5f4f4;
+            transition: background .2s ease-in
         }
     </style>
     <script>
@@ -280,6 +291,63 @@
                             <input type="checkbox" class="unavailable-checkbox" value="Tuesday|19"> 7:00 PM - 8:00 PM<br>
                             <input type="checkbox" class="unavailable-checkbox" value="Tuesday|20"> 8:00 PM - 9:00 PM<br>
                             <input type="checkbox" class="unavailable-checkbox" value="Tuesday|21"> 9:00 PM - 10:00 PM<br>
+                        </div>
+                    </div>
+                    <div class="day-section">
+                        <h4>Wednesday</h4>
+                        <div class="dropdown">
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|8"> 8:00 AM - 9:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|9"> 9:00 AM - 10:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|10"> 10:00 AM - 11:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|11"> 11:00 AM - 12:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|12"> 12:00 PM - 1:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|13"> 1:00 PM - 2:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|14"> 2:00 PM - 3:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|15"> 3:00 PM - 4:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|16"> 4:00 PM - 5:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|17"> 5:00 PM - 6:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|18"> 6:00 PM - 7:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|19"> 7:00 PM - 8:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|20"> 8:00 PM - 9:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Wednesday|21"> 9:00 PM - 10:00 PM<br>
+                        </div>
+                    </div>
+                    <div class="day-section">
+                        <h4>Thursday</h4>
+                        <div class="dropdown">
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|8"> 8:00 AM - 9:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|9"> 9:00 AM - 10:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|10"> 10:00 AM - 11:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|11"> 11:00 AM - 12:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|12"> 12:00 PM - 1:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|13"> 1:00 PM - 2:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|14"> 2:00 PM - 3:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|15"> 3:00 PM - 4:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|16"> 4:00 PM - 5:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|17"> 5:00 PM - 6:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|18"> 6:00 PM - 7:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|19"> 7:00 PM - 8:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|20"> 8:00 PM - 9:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Thursday|21"> 9:00 PM - 10:00 PM<br>
+                        </div>
+                    </div>
+                    <div class="day-section">
+                        <h4>Friday</h4>
+                        <div class="dropdown">
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|8"> 8:00 AM - 9:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|9"> 9:00 AM - 10:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|10"> 10:00 AM - 11:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|11"> 11:00 AM - 12:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|12"> 12:00 PM - 1:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|13"> 1:00 PM - 2:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|14"> 2:00 PM - 3:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|15"> 3:00 PM - 4:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|16"> 4:00 PM - 5:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|17"> 5:00 PM - 6:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|18"> 6:00 PM - 7:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|19"> 7:00 PM - 8:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|20"> 8:00 PM - 9:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Friday|21"> 9:00 PM - 10:00 PM<br>
                         </div>
                     </div>
                     <!-- Add similar sections for Wednesday, Thursday, and Friday -->
