@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anna's Perfect Schedule</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            width: 1200px;
+        }
+        .form-container {
+            width: 300px;
+            padding: 20px;
+            margin-right: 20px;
+            background: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-section h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .form-section label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-section button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .schedule-container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            position: relative;
+            height: 1440px; /* Adjusted height to fit all hours */
+        }
+        .schedule-header {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            position: absolute;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            table-layout: fixed;
+        }
+        .schedule-table th, .schedule-table td {
+            border: 1px solid #ddd;
+            text-align: center;
+            vertical-align: top;
+        }
+        .schedule-table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .schedule-table td {
+            height: 80px; /* Increased height to match class blocks */
+        }
+        .class-cell {
+            position: absolute;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+            transform: translate(8px, 90px); /* Shift class blocks right and down to align with grid */
+            z-index: 2; /* Ensure class blocks are on top of unavailable blocks */
+        }
+        .unavailable-block {
+            position: absolute;
+            background-color: #ccc;
+            opacity: 0.5;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transform: translate(8px, 90px); /* Align with grid */
+            z-index: 1; /* Ensure unavailable blocks are below class blocks */
+        }
+        .dropdown {
+            display: none;
+            margin-left: 20px;
+        }
+        .day-section h4 {
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const availableClasses = [
+                { name: "ACAD 182", type: "Lecture", day: "Monday", start: "10:00", end: "11:50" },
+                { name: "AHIS 100", type: "Lecture", day: "Tuesday", start: "9:30", end: "10:50" },
+                { name: "CSCI 201", type: "Lecture", day: "Tuesday", start: "11:00", end: "12:20" },
+                { name: "CSCI 201", type: "Lab", day: "Tuesday", start: "14:00", end: "15:50" },
+                { name: "ACAD 188", type: "Lecture", day: "Tuesday", start: "16:00", end: "17:50" },
+                { name: "CSCI 270", type: "Lecture", day: "Monday", start: "15:30", end: "16:50" },
+                { name: "ACAD 182", type: "Lecture", day: "Wednesday", start: "10:00", end: "11:50" },
+                { name: "CSCI 270", type: "Lecture", day: "Wednesday", start: "15:30", end: "16:50" },
+                { name: "AHIS 100", type: "Lecture", day: "Thursday", start: "9:30", end: "10:50" },
+                { name: "CSCI 201", type: "Lecture", day: "Thursday", start: "11:00", end: "12:20" },
+                { name: "AHIS 100", type: "Discussion", day: "Friday", start: "11:00", end: "11:50" },
+                { name: "CSCI 270", type: "Discussion", day: "Friday", start: "12:00", end: "13:50" }
+            ];
+
+            const scheduleContainer = document.querySelector(".schedule-container");
+            const dayOffsets = {
+                "Monday": 1,
+                "Tuesday": 2,
+                "Wednesday": 3,
+                "Thursday": 4,
+                "Friday": 5
+            };
+
+            document.getElementById("submit-classes").addEventListener("click", function() {
+                const selectedClasses = Array.from(document.querySelectorAll(".class-checkbox:checked")).map(checkbox => checkbox.value);
+                renderSchedule(selectedClasses);
+            });
+
+            document.getElementById("submit-unavailable").addEventListener("click", function() {
+                renderUnavailableTimes();
+            });
+
+            function renderSchedule(selectedClasses) {
+                //clear any prev schedules displayed
+                scheduleContainer.querySelectorAll(".class-cell").forEach(cell => cell.remove());
+
+                //display classes
+                availableClasses.forEach(classObj => {
+                    if (selectedClasses.includes(classObj.name)) {
+                        const startTime = parseTime(classObj.start);
+                        const endTime = parseTime(classObj.end);
+                        const duration = (endTime - startTime) / (1000 * 60); // duration in minutes
+                        const startOffset = (startTime.getHours() - 8) * 60 + startTime.getMinutes();
+
+                        const classDiv = document.createElement("div");
+                        classDiv.classList.add("class-cell");
+                        classDiv.textContent = `${classObj.name} ${classObj.type}`;
+                        classDiv.style.top = `${(startOffset / 60) * 80}px`;
+                        classDiv.style.height = `${(duration / 60) * 80}px`;
+                        classDiv.style.left = `${dayOffsets[classObj.day] * 16.5}%`;
+                        classDiv.style.width = "16%";
+
+                        scheduleContainer.appendChild(classDiv);
+                    }
+                });
+            }
+
+            function renderUnavailableTimes() {
+                //clear prev greyed out times
+                scheduleContainer.querySelectorAll(".unavailable-block").forEach(block => block.remove());
+
+                //display new greyed out times
+                document.querySelectorAll(".unavailable-checkbox:checked").forEach(checkbox => {
+                    const [day, startHour] = checkbox.value.split("|");
+                    const startTime = new Date();
+                    startTime.setHours(Number(startHour));
+                    startTime.setMinutes(0);
+                    const endTime = new Date(startTime.getTime() + 60 * 60000); // Each block represents 60 minutes
+
+                    const duration = (endTime - startTime) / (1000 * 60); // duration in minutes
+                    const startOffset = (startTime.getHours() - 8) * 60 + startTime.getMinutes();
+
+                    const unavailableDiv = document.createElement("div");
+                    unavailableDiv.classList.add("unavailable-block");
+                    unavailableDiv.style.top = `${(startOffset / 60) * 80}px`;
+                    unavailableDiv.style.height = `${(duration / 60) * 80}px`;
+                    unavailableDiv.style.left = `${dayOffsets[day] * 16.5}%`;
+                    unavailableDiv.style.width = "16%";
+
+                    scheduleContainer.appendChild(unavailableDiv);
+                });
+            }
+
+            function parseTime(timeString) {
+                const [hours, minutes] = timeString.split(":").map(Number);
+                const date = new Date();
+                date.setHours(hours);
+                date.setMinutes(minutes);
+                date.setSeconds(0);
+                date.setMilliseconds(0);
+                return date;
+            }
+
+            //dropdown visibility
+            document.querySelectorAll(".day-section h4").forEach(header => {
+                header.addEventListener("click", function() {
+                    const dropdown = this.nextElementSibling;
+                    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="form-section">
+                <h3>Required Courses</h3>
+                <label>Select Required Courses:</label>
+                <div class="course-category">
+                    <h4>ACAD</h4>
+                    <input type="checkbox" class="class-checkbox" value="ACAD 182"> ACAD 182<br>
+                    <input type="checkbox" class="class-checkbox" value="ACAD 188"> ACAD 188<br>
+                </div>
+                <div class="course-category">
+                    <h4>AHIS</h4>
+                    <input type="checkbox" class="class-checkbox" value="AHIS 100"> AHIS 100<br>
+                </div>
+                <div class="course-category">
+                    <h4>CSCI</h4>
+                    <input type="checkbox" class="class-checkbox" value="CSCI 201"> CSCI 201<br>
+                    <input type="checkbox" class="class-checkbox" value="CSCI 270"> CSCI 270<br>
+                </div>
+                <button id="submit-classes">Submit</button>
+            </div>
+            <div class="form-section">
+                <h3>Personal Preferences</h3>
+                <label>Select Unavailable Times:</label>
+                <div id="unavailable-times">
+                    <div class="day-section">
+                        <h4>Monday</h4>
+                        <div class="dropdown">
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|8"> 8:00 AM - 9:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|9"> 9:00 AM - 10:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|10"> 10:00 AM - 11:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|11"> 11:00 AM - 12:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|12"> 12:00 PM - 1:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|13"> 1:00 PM - 2:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|14"> 2:00 PM - 3:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|15"> 3:00 PM - 4:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|16"> 4:00 PM - 5:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|17"> 5:00 PM - 6:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|18"> 6:00 PM - 7:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|19"> 7:00 PM - 8:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|20"> 8:00 PM - 9:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Monday|21"> 9:00 PM - 10:00 PM<br>
+                        </div>
+                    </div>
+                    <div class="day-section">
+                        <h4>Tuesday</h4>
+                        <div class="dropdown">
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|8"> 8:00 AM - 9:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|9"> 9:00 AM - 10:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|10"> 10:00 AM - 11:00 AM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|11"> 11:00 AM - 12:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|12"> 12:00 PM - 1:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|13"> 1:00 PM - 2:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|14"> 2:00 PM - 3:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|15"> 3:00 PM - 4:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|16"> 4:00 PM - 5:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|17"> 5:00 PM - 6:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|18"> 6:00 PM - 7:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|19"> 7:00 PM - 8:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|20"> 8:00 PM - 9:00 PM<br>
+                            <input type="checkbox" class="unavailable-checkbox" value="Tuesday|21"> 9:00 PM - 10:00 PM<br>
+                        </div>
+                    </div>
+                    <!-- Add similar sections for Wednesday, Thursday, and Friday -->
+                </div>
+                <button id="submit-unavailable">Submit Unavailable Times</button>
+            </div>
+            <div class="form-section">
+    			<h3>Recommended Schedule</h3>
+    				<ul>
+				        <li>CSCI 201 - Lecture, Lab, Quiz</li>
+				        <li>CSCI 270 - Lecture, Discussion, Quiz</li>
+				        <li>ACAD 182 - Lecture</li>
+				        <li>ACAD 188 - Lecture</li>
+				        <li>AHIS 100 - Lecture, Discussion</li>
+				    </ul>
+			    <button onclick="window.location.href='prevschedules.html'">View Previous Schedules</button>
+			</div>
+        </div>
+        <div class="schedule-container">
+            <div class="schedule-header">Anna's Perfect Schedule</div>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>8 AM - 9 AM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>9 AM - 10 AM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>10 AM - 11 AM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>11 AM - 12 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>12 PM - 1 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1 PM - 2 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>2 PM - 3 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>3 PM - 4 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>4 PM - 5 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                       
+
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>5 PM - 6 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>6 PM - 7 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>7 PM - 8 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>8 PM - 9 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>9 PM - 10 PM</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
