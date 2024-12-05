@@ -9,6 +9,8 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
    
 public class Authenticator {
 	private Path session; // stores the Path object to the session file for list of users in session
@@ -72,12 +74,20 @@ public class Authenticator {
 	
 	// if user is logged in, the identifier would be on flie
 	// inSession(identifier) would return the userid on the device
-	public String login(String username, String password, String identifier) {
+	public String login(String username, String password) {
 		// if error, return error message string from getUser
 		// if password incorrect, return "password incorrect!"
 		// identifier: the thing used to identify the device the user is currently on
 		// else, add user to session and return "login successful"
 		Vector<String> result = JDBC.getUser(username);
+        LocalDateTime now = LocalDateTime.now();
+
+		// Define the format
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+		// Format the current date and time
+		String identifier =  now.format(formatter);
+        
 		if(result.size() == 1)
 			return result.getFirst();
 		
