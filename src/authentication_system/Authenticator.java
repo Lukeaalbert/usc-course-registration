@@ -1,16 +1,5 @@
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Connection;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Vector;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
    
 public class Authenticator {
 	public String user_id;
@@ -33,13 +22,6 @@ public class Authenticator {
 		// identifier: the thing used to identify the device the user is currently on
 		// else, add user to session and return "login successful"
 		Vector<String> result = JDBC.getUser(username);
-        LocalDateTime now = LocalDateTime.now();
-
-		// Define the format
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-		// Format the current date and time
-		String identifier =  now.format(formatter);
         
 		if(result.size() == 1)
 			return result.getFirst();
