@@ -31,7 +31,9 @@ public class Main {
         String username = scanner.nextLine();
         System.out.print("Enter SQL password: ");
         String password = scanner.nextLine();
-        JDBC.establishJDBCConnection(username, password);
+        System.out.print("Enter SQL schema: ");
+        String schema = scanner.nextLine();
+        JDBC.establishJDBCConnection(username, password, schema);
 
         System.out.print("Enter new database name: ");
         String new_database_name = scanner.nextLine();
