@@ -6,10 +6,10 @@ Mo Jiang (mojiang@usc.edu), Breeze Pickford (bpickfor@usc.edu), Luke Albert (lpa
 Jasmita Yechuri (yechuri@usc.edu), Advay Iyer (advayiye@usc.edu), Samuel Wu (samuelsw@usc.edu),
 Satwika Vemuri (vemurina@usc.edu), Edward Shao (shaoe@usc.edu).
 
-### important:
-make sure sql has a users table defined as following, for the JDBC to work:
-password do not set as NOT NULL: for Google SSO users
-as NULL password is prevented on the web interface
+### changes needed for authentication to work:
+1. add the jar files (GSON and JDBC connector)
+2. in src/main/JDBC.java: change the string for SQL connection: connect it to your schema
+3. make sure you have a users table like this; else drop it and run JDBC.createUserTable()
 ```sql
 CREATE TABLE users (
     id INT PRIMARY KEY auto_increment,
@@ -18,3 +18,4 @@ CREATE TABLE users (
     password VARCHAR(100)
 );
 ```
+4. in line 12 of Authenticator.java: change it to your username and password 
