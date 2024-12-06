@@ -215,7 +215,7 @@ public class CourseInfoFinder {
         
     }
     
-    
+    /*
     public static void main(String[] args){
         for(int i = 0; i < departments.length; i++){
             String department = departments[i];
@@ -230,6 +230,7 @@ public class CourseInfoFinder {
             }
         }
     }
+    */
     
 }
 
