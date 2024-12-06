@@ -1,4 +1,4 @@
-//package semester_SQL_creator;
+package semester_SQL_creator;
 import java.sql.*;
 import java.util.Vector;
 import java.util.HashSet;
@@ -12,11 +12,11 @@ public class JDBC {
     	return connection != null;
     }
 
-    public static void establishJDBCConnection(String username, String password) {
+    public static void establishJDBCConnection(String username, String password, String schema) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            String connection_url = "jdbc:mysql://localhost:3306/final_proj?user=" + username + 
+            String connection_url = "jdbc:mysql://localhost:3306/" + schema + "?user=" + username + 
                                  "&password=" + password +
                                  "&useSSL=false&allowPublicKeyRetrieval=true";
 

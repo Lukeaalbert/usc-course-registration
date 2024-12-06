@@ -215,7 +215,7 @@ public class CourseInfoFinder {
         
     }
     
-    /*
+    
     public static void main(String[] args){
         for(int i = 0; i < departments.length; i++){
             String department = departments[i];
@@ -230,7 +230,7 @@ public class CourseInfoFinder {
             }
         }
     }
-    */
+    
 }
 
 class Section{
@@ -238,7 +238,7 @@ class Section{
     String type;
     String day;
     String time;
-    String loc; 
+    String loc;
     String prof_name;
     Section(String id_and_d_class_code, String type, String day, String time, String loc, String prof_name){
         this.id_and_d_class_code = id_and_d_class_code;
