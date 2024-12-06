@@ -175,11 +175,11 @@
 
             const scheduleContainer = document.querySelector(".schedule-container");
             const dayOffsets = {
-                "Monday": 1,
-                "Tuesday": 2,
-                "Wednesday": 3,
-                "Thursday": 4,
-                "Friday": 5
+                "M": 1,
+                "T": 2,
+                "W": 3,
+                "TH": 4,
+                "F": 5
             };
             
             // search for classes
@@ -207,10 +207,7 @@
             		})
             		.then(data => {
             			
-            			console.log(data);
-            			
             			const resultDiv = document.getElementById("searchResults");
-            			resultDiv.innerHTML = '';
             			
             			for (let i = 0; i < data.length; i++) {
             			    const key = Object.keys(data[i])[0];
@@ -241,12 +238,26 @@
         			    		days += courseDetails[6][courseDetails[6].length - 1];
         			    	}
             			    
+            			 	// green default (for lectures/random)
+            			    let color = "rgb(234, 255, 227)";
+                            // purple for quiz
+                            if (courseDetails[5] == "Qz") {
+                            	color = "rgb(222, 205, 247)";
+                            }
+                            // blue for discussion and lab
+                            else if (courseDetails[5] == "Lab"
+                            		|| courseDetails[5] == "Dis") {
+                            	color = "rgb(205, 241, 247)";
+                            }
+                            
             			    // TODO: Add class="class-checkbox" to input tag once feature is implimented
             			    // to add searched classes to schedule.
-            			    const display = `<div class="course-selection">
-            			    					<input type="checkbox" id="${courseDetails[0]}" name="${courseDetails[0]}" value="${courseDetails[1]}">
+            			    const display = `<div class="course-selection" style="background-color: ${color};">
+            			    					<input type="checkbox" id="${courseDetails[0]}" class = "class-checkbox" name="${courseDetails[0]}" value="${courseDetails[1]} $ ${courseDetails[5]} $ ${days} $ ${courseDetails[7]}">
             			    						<label for="${courseDetails[0]}">
-            			    							<strong>${courseDetails[1]}: ${courseDetails[2]}</strong><br><br>
+            			    							<strong>${courseDetails[1]}: ${courseDetails[2]}<br><br>
+            			    							
+            			    							${courseDetails[9]}</strong><br><br>
             			    							<i>${courseDetails[5]}, ${courseDetails[0]},<br>
             			    							${days}; ${courseDetails[7]}</i>
             			    						</label>
@@ -286,26 +297,73 @@
             function renderSchedule(selectedClasses) {
                 //clear any prev schedules displayed
                 scheduleContainer.querySelectorAll(".class-cell").forEach(cell => cell.remove());
+                
+                for (let i = 0; i < selectedClasses.length; i++) {
+                	const parts = selectedClasses[i].split(" $ ");
 
-                //display classes
-                availableClasses.forEach(classObj => {
-                    if (selectedClasses.includes(classObj.name)) {
-                        const startTime = parseTime(classObj.start);
-                        const endTime = parseTime(classObj.end);
-                        const duration = (endTime - startTime) / (1000 * 60); // duration in minutes
-                        const startOffset = (startTime.getHours() - 8) * 60 + startTime.getMinutes();
+                	const name = parts[0];
+                	const type = parts[1];
+                	const days = parts[2];
+                	const timeRange = parts[3];
+                	const [startTime, endTime] = timeRange.split("-");
+                	
+                	const st = parseTime(startTime);
+                	const et = parseTime(endTime);
+                	
+                	const duration = (et - st) / (1000 * 60); // duration in minutes
+                    const startOffset = (st.getHours() - 8) * 60 + st.getMinutes();
+                	
+                    console.log("days " + days);
+                    
+                    const dayArray = days.split(", ");
+
+                    for (let i = 0; i < dayArray.length; i++) {
+                        const day = dayArray[i];
 
                         const classDiv = document.createElement("div");
                         classDiv.classList.add("class-cell");
-                        classDiv.textContent = `${classObj.name} ${classObj.type}`;
+                        classDiv.textContent = `${name} ${type}`;
                         classDiv.style.top = `${(startOffset / 60) * 80}px`;
                         classDiv.style.height = `${(duration / 60) * 80}px`;
-                        classDiv.style.left = `${dayOffsets[classObj.day] * 16.5}%`;
+                        classDiv.style.left = `${dayOffsets[day] * 16.5}%`;
                         classDiv.style.width = "16%";
+                        
+                        // Create overlay element
+                        const overlay = document.createElement("div");
+                        overlay.style.top = "0";
+                        overlay.style.left = "0";
+                        overlay.style.width = "100%";
+                        overlay.style.height = "100%";
+                        overlay.style.display = "none";
+                        overlay.style.justifyContent = "center";
+                        overlay.style.alignItems = "center";
+                        overlay.style.color = "white";
+                        overlay.style.fontWeight = "bold";
+                        
+                        classDiv.addEventListener("mouseenter", () => {
+                            classDiv.style.transition = "background-color 0.3s ease-in-out";
+                            classDiv.style.backgroundColor = "red";
+                            overlay.style.opacity = "1";
+                            overlay.style.display = "flex";
+                        });
 
+                        classDiv.addEventListener("mouseleave", () => {
+                            classDiv.style.backgroundColor = ""; // Reset to original color
+                            overlay.style.backgroundColor = "rgba(255, 0, 0, 0)";
+                            overlay.style.opacity = "0";
+                        });
+                        
+                        // Click event to remove
+                        classDiv.addEventListener("click", () => {
+                            scheduleContainer.removeChild(classDiv);
+                        });
+                        
+                        classDiv.appendChild(overlay);
+                        
                         scheduleContainer.appendChild(classDiv);
                     }
-                });
+                }
+                
             }
 
             function renderUnavailableTimes() {
@@ -631,6 +689,7 @@
             </table>
         </div>
     </div>
+    <div id = "selected_classes" style="visibility: hidden"></div>
 </body>
 </html>
 
