@@ -1,4 +1,4 @@
-package semester_SQL_creator;
+//package semester_SQL_creator;
 import java.sql.*;
 import java.util.Vector;
 import java.util.HashSet;
@@ -12,11 +12,11 @@ public class JDBC {
     	return connection != null;
     }
 
-    public static void establishJDBCConnection(String username, String password, String schema) {
+    public static void establishJDBCConnection(String username, String password) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            String connection_url = "jdbc:mysql://localhost:3306/" + schema + "?user=" + username + 
+            String connection_url = "jdbc:mysql://localhost:3306/final_proj?user=" + username + 
                                  "&password=" + password +
                                  "&useSSL=false&allowPublicKeyRetrieval=true";
 
@@ -53,74 +53,74 @@ public class JDBC {
         }
     }
 
-   private static void populateDb(Vector<Vector<Course>> courses) {
-       try {
-           String sql = "CREATE TABLE courses ("
-                   + "id VARCHAR(255) PRIMARY KEY, "
-                   + "course_name VARCHAR(255), "
-                   + "course_title VARCHAR(255), "
-                   + "course_description TEXT, "
-                   + "units VARCHAR(255), "
-                   + "type VARCHAR(255), "
-                   + "day VARCHAR(255), "
-                   + "time VARCHAR(255), "
-                   + "loc VARCHAR(255), "
-                   + "prof VARCHAR(255)) ";
-
-           stmt.executeUpdate(sql);
-
-			// For managing already seen sections
-           HashSet<String> processedSections = new HashSet<>();
-           
-           PreparedStatement pstmt = connection.prepareStatement(
-               "INSERT INTO courses (id, course_name, course_title, course_description, " +
-               "units, type, day, time, loc, prof) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-           for (Vector<Course> dep : courses) {
-               for (Course course : dep) {
-                   for (Section section : course.sections) {
-
-                       // Skip if we've already processed this section
-                       if (!processedSections.add(section.id_and_d_class_code)) {
-                           System.out.println("Skipped duplicate section: " + section.id_and_d_class_code + 
-                                            " for course: " + course.name);
-                           continue;
-                       }
-
-                       try {
-                           pstmt.setString(1, section.id_and_d_class_code);
-                           pstmt.setString(2, course.name);
-                           pstmt.setString(3, course.title);
-                           pstmt.setString(4, course.description);
-                           pstmt.setString(5, course.units);
-                           pstmt.setString(6, section.type);
-                           pstmt.setString(7, section.day);
-                           pstmt.setString(8, section.time);
-                           pstmt.setString(9, section.loc);
-                           pstmt.setString(10, section.prof_name);
-                           
-                           pstmt.executeUpdate();
-							
-                       } catch (SQLException e) {
-                           System.out.println("Error inserting course: " + course.name + 
-                                            " section: " + section.id_and_d_class_code);
-                           e.printStackTrace();
-                       }
-                   }
-               }
-           }
-           pstmt.close();
-       } catch (SQLException e) {
-           System.out.println("Error creating table or preparing statement: " + e.getMessage());
-           e.printStackTrace();
-       }
-   }
-
-   public static void populateSqlDb(String databaseName, Vector<Vector<Course>> courses) {
-       createDb(databaseName);
-       populateDb(courses);
-   }
-
+//    private static void populateDb(Vector<Vector<Course>> courses) {
+//        try {
+//            String sql = "CREATE TABLE courses ("
+//                    + "id VARCHAR(255) PRIMARY KEY, "
+//                    + "course_name VARCHAR(255), "
+//                    + "course_title VARCHAR(255), "
+//                    + "course_description TEXT, "
+//                    + "units VARCHAR(255), "
+//                    + "type VARCHAR(255), "
+//                    + "day VARCHAR(255), "
+//                    + "time VARCHAR(255), "
+//                    + "loc VARCHAR(255), "
+//                    + "prof VARCHAR(255)) ";
+//
+//            stmt.executeUpdate(sql);
+//
+//			// For managing already seen sections
+//            HashSet<String> processedSections = new HashSet<>();
+//            
+//            PreparedStatement pstmt = connection.prepareStatement(
+//                "INSERT INTO courses (id, course_name, course_title, course_description, " +
+//                "units, type, day, time, loc, prof) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+//
+//            for (Vector<Course> dep : courses) {
+//                for (Course course : dep) {
+//                    for (Section section : course.sections) {
+//
+//                        // Skip if we've already processed this section
+//                        if (!processedSections.add(section.id_and_d_class_code)) {
+//                            System.out.println("Skipped duplicate section: " + section.id_and_d_class_code + 
+//                                             " for course: " + course.name);
+//                            continue;
+//                        }
+//
+//                        try {
+//                            pstmt.setString(1, section.id_and_d_class_code);
+//                            pstmt.setString(2, course.name);
+//                            pstmt.setString(3, course.title);
+//                            pstmt.setString(4, course.description);
+//                            pstmt.setString(5, course.units);
+//                            pstmt.setString(6, section.type);
+//                            pstmt.setString(7, section.day);
+//                            pstmt.setString(8, section.time);
+//                            pstmt.setString(9, section.loc);
+//                            pstmt.setString(10, section.prof_name);
+//                            
+//                            pstmt.executeUpdate();
+//							
+//                        } catch (SQLException e) {
+//                            System.out.println("Error inserting course: " + course.name + 
+//                                             " section: " + section.id_and_d_class_code);
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
+//            pstmt.close();
+//        } catch (SQLException e) {
+//            System.out.println("Error creating table or preparing statement: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    public static void populateSqlDb(String databaseName, Vector<Vector<Course>> courses) {
+//        createDb(databaseName);
+//        populateDb(courses);
+//    }
+//
     // insert a user into database, assume users is a table with (id INT PRIMARY KEY, username VARCHAR(100), email VARCHAR(100), password VARCHAR(100))
     public static boolean insertUser(String username, String email, String password){
         try{

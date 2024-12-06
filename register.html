@@ -37,7 +37,7 @@
             border-radius: 5px;
         }
 
-        .register-container button {
+        #submit-button {
             padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
@@ -47,34 +47,49 @@
             width: 100%;
         }
 
-        .register-container button:hover {
+        #submit-button :hover {
             background-color: #388E3C;
         }
     </style>
     <script>
-        function validateSignUp() {
+        function validateSignUp(event) {
+        	event.preventDefault();
+        	
             const username = document.getElementById("username").value;
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
-            if (username === "" || email === "" || password === "") {
-                alert("All fields are required. Please fill out the form completely.");
-                return false;
-            }
-            alert("Registration Successful!");
-            window.location.href = "schedule.html";
+            var jsonData = {"username":username, "password":password, "email": email};
+            var url="register";
+
+            fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, 
+            body: JSON.stringify(jsonData)})
+            .then(response=>{return response.json();})
+            .then(result=>{
+                if(result.message === "registraton successful"){
+                	localStorage.setItem("logged-in", "yes");
+                    localStorage.setItem("user_id", result.user_id);
+                    window.location.assign("schedule.html"); // Redirect to schedule page
+                } else{
+                	document.getElementById("username").value = "";
+                	document.getElementById("password").value = "";
+                	document.getElementById("email").value="";
+                	alert(result.message);
+                }
+            });
         }
     </script>
 </head>
 
 <body>
-    <div class="register-container">
+	<form class="register-container" onsubmit="validateSignUp(event)">
         <h2>Register</h2>
         <input type="text" id="username" placeholder="Username" required><br>
         <input type="email" id="email" placeholder="Email" required><br>
         <input type="password" id="password" placeholder="Password" required><br>
-        <button onclick="validateSignUp()">Submit</button>
-    </div>
+        <input type="submit" id="submit-button" value="Register">
+    </form>
+    
 </body>
 
 </html>

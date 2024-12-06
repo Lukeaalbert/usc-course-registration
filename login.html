@@ -60,14 +60,19 @@
             .then(response=>{return response.json();})
             .then(result=>{
                 if(result.message === "login successful"){
-                	window.location.href = "schedule.html"; // Redirect to schedule page
+                	window.location.assign("schedule.html");
+                	localStorage.setItem("logged-in", "yes");
+                    localStorage.setItem("user_id", result.user_id);
                 } else{
                 	document.getElementById("username").value = "";
                 	document.getElementById("password").value = "";
-                	alert("Invalid username or password. Please try again.");
+                	alert(result.message);
                 }
             });
-            
+        }
+        
+        async function asdadasd(){
+        	
         }
     </script>
 </head>
