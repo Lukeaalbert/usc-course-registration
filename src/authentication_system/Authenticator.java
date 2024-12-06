@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
    
 public class Authenticator {
 	private Path session; // stores the Path object to the session file for list of users in session
+	public String user_id;
 	// login
 	// logout
 	// register
@@ -104,6 +105,8 @@ public class Authenticator {
 			return "unable to add current user to session: " + e.getMessage();
 		}
 		
+		user_id = result.getFirst();
+		
 		return "login successful";
 	}
 	
@@ -124,15 +127,32 @@ public class Authenticator {
 	}
 	
 	public String register(String username, String email, String password) {
+		// REPLACE connection 
+		if(!JDBC.hasConnection())
+			JDBC.establishJDBCConnection("root", "temp_pass123");
+		
 		Vector<String> result = JDBC.getUser(username);
 		if(result.size() > 1)
 			return "username already exists";
 		
-		return JDBC.insertUser(username, email, password) ? "registraton successful" : "registration unsuccessful, input 100 character max";
+		boolean register = JDBC.insertUser(username, email, password);
+		if(register) {
+			result = JDBC.getUser(username);
+			user_id = result.getFirst();
+			return "registraton successful";
+		} else {
+			user_id = "-1";
+			return "registration unsuccessful, input 100 character max";
+		}
+		
 	}
 	
 	public String deleteAccount(String username) {
 		Vector<String> result = JDBC.getUser(username);
+		// REPLACE connection 
+		if(!JDBC.hasConnection())
+			JDBC.establishJDBCConnection("root", "temp_pass123");
+		
 		if(result.size() == 1)
 			return result.getFirst();
 		
@@ -143,7 +163,7 @@ public class Authenticator {
 	public static void main(String args[]) {
 		try {
 			JDBC database = new JDBC();
-			database.establishJDBCConnection();
+			database.establishJDBCConnection("root", "temp_pass123");
 			Authenticator a = new Authenticator();
 			System.out.println(a.deleteAccount("user2"));
 		}catch(IOException e) {

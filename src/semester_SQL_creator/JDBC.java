@@ -1,4 +1,4 @@
-package semester_SQL_creator;
+//package semester_SQL_creator;
 import java.sql.*;
 import java.util.Vector;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ public class JDBC {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            String connection_url = "jdbc:mysql://localhost:3306/?user=" + username + 
+            String connection_url = "jdbc:mysql://localhost:3306/final_proj?user=" + username + 
                                  "&password=" + password +
                                  "&useSSL=false&allowPublicKeyRetrieval=true";
 
@@ -53,73 +53,73 @@ public class JDBC {
         }
     }
 
-    private static void populateDb(Vector<Vector<Course>> courses) {
-        try {
-            String sql = "CREATE TABLE courses ("
-                    + "id VARCHAR(255) PRIMARY KEY, "
-                    + "course_name VARCHAR(255), "
-                    + "course_title VARCHAR(255), "
-                    + "course_description TEXT, "
-                    + "units VARCHAR(255), "
-                    + "type VARCHAR(255), "
-                    + "day VARCHAR(255), "
-                    + "time VARCHAR(255), "
-                    + "loc VARCHAR(255), "
-                    + "prof VARCHAR(255)) ";
+   private static void populateDb(Vector<Vector<Course>> courses) {
+       try {
+           String sql = "CREATE TABLE courses ("
+                   + "id VARCHAR(255) PRIMARY KEY, "
+                   + "course_name VARCHAR(255), "
+                   + "course_title VARCHAR(255), "
+                   + "course_description TEXT, "
+                   + "units VARCHAR(255), "
+                   + "type VARCHAR(255), "
+                   + "day VARCHAR(255), "
+                   + "time VARCHAR(255), "
+                   + "loc VARCHAR(255), "
+                   + "prof VARCHAR(255)) ";
 
-            stmt.executeUpdate(sql);
+           stmt.executeUpdate(sql);
 
 			// For managing already seen sections
-            HashSet<String> processedSections = new HashSet<>();
-            
-            PreparedStatement pstmt = connection.prepareStatement(
-                "INSERT INTO courses (id, course_name, course_title, course_description, " +
-                "units, type, day, time, loc, prof) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+           HashSet<String> processedSections = new HashSet<>();
+           
+           PreparedStatement pstmt = connection.prepareStatement(
+               "INSERT INTO courses (id, course_name, course_title, course_description, " +
+               "units, type, day, time, loc, prof) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-            for (Vector<Course> dep : courses) {
-                for (Course course : dep) {
-                    for (Section section : course.sections) {
+           for (Vector<Course> dep : courses) {
+               for (Course course : dep) {
+                   for (Section section : course.sections) {
 
-                        // Skip if we've already processed this section
-                        if (!processedSections.add(section.id_and_d_class_code)) {
-                            System.out.println("Skipped duplicate section: " + section.id_and_d_class_code + 
-                                             " for course: " + course.name);
-                            continue;
-                        }
+                       // Skip if we've already processed this section
+                       if (!processedSections.add(section.id_and_d_class_code)) {
+                           System.out.println("Skipped duplicate section: " + section.id_and_d_class_code + 
+                                            " for course: " + course.name);
+                           continue;
+                       }
 
-                        try {
-                            pstmt.setString(1, section.id_and_d_class_code);
-                            pstmt.setString(2, course.name);
-                            pstmt.setString(3, course.title);
-                            pstmt.setString(4, course.description);
-                            pstmt.setString(5, course.units);
-                            pstmt.setString(6, section.type);
-                            pstmt.setString(7, section.day);
-                            pstmt.setString(8, section.time);
-                            pstmt.setString(9, section.loc);
-                            pstmt.setString(10, section.prof_name);
-                            
-                            pstmt.executeUpdate();
+                       try {
+                           pstmt.setString(1, section.id_and_d_class_code);
+                           pstmt.setString(2, course.name);
+                           pstmt.setString(3, course.title);
+                           pstmt.setString(4, course.description);
+                           pstmt.setString(5, course.units);
+                           pstmt.setString(6, section.type);
+                           pstmt.setString(7, section.day);
+                           pstmt.setString(8, section.time);
+                           pstmt.setString(9, section.loc);
+                           pstmt.setString(10, section.prof_name);
+                           
+                           pstmt.executeUpdate();
 							
-                        } catch (SQLException e) {
-                            System.out.println("Error inserting course: " + course.name + 
-                                             " section: " + section.id_and_d_class_code);
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-            pstmt.close();
-        } catch (SQLException e) {
-            System.out.println("Error creating table or preparing statement: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+                       } catch (SQLException e) {
+                           System.out.println("Error inserting course: " + course.name + 
+                                            " section: " + section.id_and_d_class_code);
+                           e.printStackTrace();
+                       }
+                   }
+               }
+           }
+           pstmt.close();
+       } catch (SQLException e) {
+           System.out.println("Error creating table or preparing statement: " + e.getMessage());
+           e.printStackTrace();
+       }
+   }
 
-    public static void populateSqlDb(String databaseName, Vector<Vector<Course>> courses) {
-        createDb(databaseName);
-        populateDb(courses);
-    }
+   public static void populateSqlDb(String databaseName, Vector<Vector<Course>> courses) {
+       createDb(databaseName);
+       populateDb(courses);
+   }
 
     // insert a user into database, assume users is a table with (id INT PRIMARY KEY, username VARCHAR(100), email VARCHAR(100), password VARCHAR(100))
     public static boolean insertUser(String username, String email, String password){
@@ -129,20 +129,11 @@ public class JDBC {
         	
         	if(getUser(username).size() > 1) // a user exists
         		return false;
-        	
-            PreparedStatement getMaxID = connection.prepareStatement("SELECT MAX(user_id) AS m FROM users;");
-            ResultSet rs = getMaxID.executeQuery();
-            int max_idx = 1;
-            // get max index and add one for new id
-            // if result set empty, meaning table is none, then let index be 1
-            if(rs.next())
-            	max_idx = rs.getInt("m") + 1;
             
-            PreparedStatement insertIntoBase = connection.prepareStatement("INSERT INTO users(user_id, username, email, password) VALUES (?, ?, ?, ?);");
-            insertIntoBase.setInt(1, max_idx);
-            insertIntoBase.setString(2, username);
-            insertIntoBase.setString(3, email);
-            insertIntoBase.setString(4, password);
+            PreparedStatement insertIntoBase = connection.prepareStatement("INSERT INTO users(username, email, password) VALUES (?, ?, ?);");
+            insertIntoBase.setString(1, username);
+            insertIntoBase.setString(2, email);
+            insertIntoBase.setString(3, password);
             insertIntoBase.execute();
             return true;
         } catch(SQLException sqle){
@@ -151,7 +142,7 @@ public class JDBC {
         }
         return false;
     }
-    
+//    
     // get information for user providing username
     // if exists: "id", "username", "email", "password"
     // if an error occurs, result a vector of single String
@@ -168,7 +159,7 @@ public class JDBC {
         	if(!rs.next()) {
         		results.add("user doesn't exist!");
         	} else {
-        		results.add("" + rs.getInt("user_id"));
+        		results.add("" + rs.getInt("id"));
         		results.add(rs.getString("username"));
         		results.add(rs.getString("email"));
         		results.add(rs.getString("password"));
@@ -186,13 +177,13 @@ public class JDBC {
     public static Vector<String> getUser(int id){
     	Vector<String> results = new Vector<>();
     	try {
-    		PreparedStatement getUserByUsername = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?;");
+    		PreparedStatement getUserByUsername = connection.prepareStatement("SELECT * FROM users WHERE id = ?;");
     		getUserByUsername.setInt(1, id);
     		ResultSet rs = getUserByUsername.executeQuery();
         	if(!rs.next()) {
         		results.add("user doesn't exist!");
         	} else {
-        		results.add("" + rs.getInt("user_id"));
+        		results.add("" + rs.getInt("id"));
         		results.add(rs.getString("username"));
         		results.add(rs.getString("email"));
         		results.add(rs.getString("password"));
@@ -224,7 +215,7 @@ public class JDBC {
     // overload, delete by id
     public static boolean dropUser(int id) {
     	try {
-    		PreparedStatement getUserByUsername = connection.prepareStatement("DELETE FROM users WHERE user_id = ?;");
+    		PreparedStatement getUserByUsername = connection.prepareStatement("DELETE FROM users WHERE id = ?;");
     		getUserByUsername.setInt(1, id);
     		getUserByUsername.execute();
         	return true;
