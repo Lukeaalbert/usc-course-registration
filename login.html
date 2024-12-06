@@ -32,7 +32,7 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-        .login-container button {
+        #submit-button {
             padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
@@ -41,29 +41,42 @@
             cursor: pointer;
             width: 100%;
         }
-        .login-container button:hover {
+        #submit-button :hover {
             background-color: #45a049;
         }
     </style>
     <script>
-        function validateLogin() {
+        async function validateLogin(event) {
+        	event.preventDefault();
+        	
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
+            
+            var jsonData = {"username":username, "password":password};
+            var url="login";
 
-            if (username === "bestgroup" && password === "ever") {
-                window.location.href = "schedule.html"; // Redirect to schedule page
-            } else {
-                alert("Invalid username or password. Please try again.");
-            }
+            fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, 
+            body: JSON.stringify(jsonData)})
+            .then(response=>{return response.json();})
+            .then(result=>{
+                if(result.message === "login successful"){
+                	window.location.href = "schedule.html"; // Redirect to schedule page
+                } else{
+                	document.getElementById("username").value = "";
+                	document.getElementById("password").value = "";
+                	alert("Invalid username or password. Please try again.");
+                }
+            });
+            
         }
     </script>
 </head>
 <body>
-    <div class="login-container">
+    <form class="login-container" onsubmit="validateLogin(event)">
         <h2>Login</h2>
         <input type="text" id="username" placeholder="Username" required><br>
         <input type="password" id="password" placeholder="Password" required><br>
-        <button onclick="validateLogin()">Login</button>
-    </div>
+        <input type="submit" id="submit-button" value="Login">
+    </form>
 </body>
 </html>
