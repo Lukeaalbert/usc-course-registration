@@ -35,6 +35,7 @@
             margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            box-sizing: border-box; 
         }
 
         #submit-button {
@@ -59,7 +60,11 @@
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
-            var jsonData = {"username":username, "password":password, "email": email};
+            registerUser(username, password, email);
+        }
+        
+        async function registerUser(username, password, email){
+        	var jsonData = {"username":username, "password":password, "email": email};
             var url="register";
 
             fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, 

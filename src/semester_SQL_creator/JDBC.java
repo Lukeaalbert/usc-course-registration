@@ -16,6 +16,7 @@ public class JDBC {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
+            // change your schema here
             String connection_url = "jdbc:mysql://localhost:3306/final_proj?user=" + username + 
                                  "&password=" + password +
                                  "&useSSL=false&allowPublicKeyRetrieval=true";
@@ -52,6 +53,9 @@ public class JDBC {
             e.printStackTrace();
         }
     }
+
+// NOTICE: THESE LINES ARE COMMENTED BECAUSE THEY RELATE TO DATABASE CREATION, WHICH 
+// IS NOT NEEDED IF YOU HAVE DATABASE IN PLACE; OTHERWISE, RUN THEM
 
 //    private static void populateDb(Vector<Vector<Course>> courses) {
 //        try {
@@ -115,12 +119,23 @@ public class JDBC {
 //            e.printStackTrace();
 //        }
 //    }
-//
+
 //    public static void populateSqlDb(String databaseName, Vector<Vector<Course>> courses) {
 //        createDb(databaseName);
 //        populateDb(courses);
 //    }
-//
+
+
+//    private static void createUserTable() {
+//        try {
+//            String sql = "CREATE TABLE users ("
+//                         + "id INT PRIMARY KEY auto_increment,"
+//                         + "username VARCHAR(100),"
+//                         + "email VARCHAR(100),"
+//                         + "password VARCHAR(100));"
+//            stmt.executeUpdate(sql);
+//    }
+
     // insert a user into database, assume users is a table with (id INT PRIMARY KEY, username VARCHAR(100), email VARCHAR(100), password VARCHAR(100))
     public static boolean insertUser(String username, String email, String password){
         try{
