@@ -5,3 +5,17 @@ This repo contains our final project for CSCI 201: a revised version of USC's co
 Mo Jiang (mojiang@usc.edu), Breeze Pickford (bpickfor@usc.edu), Luke Albert (lpalbert@usc.edu),
 Jasmita Yechuri (yechuri@usc.edu), Advay Iyer (advayiye@usc.edu), Samuel Wu (samuelsw@usc.edu),
 Satwika Vemuri (vemurina@usc.edu), Edward Shao (shaoe@usc.edu).
+
+### changes needed for authentication to work:
+1. add the jar files (GSON and JDBC connector)
+2. in src/main/JDBC.java: change the string for SQL connection: connect it to your schema
+3. make sure you have a users table like this; else drop it and run JDBC.createUserTable()
+```sql
+CREATE TABLE users (
+    id INT PRIMARY KEY auto_increment,
+    username VARCHAR(100),
+    email VARCHAR(100),
+    password VARCHAR(100)
+);
+```
+4. in line 12 of Authenticator.java: change it to your username and password 
