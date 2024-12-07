@@ -56,6 +56,22 @@ function saveSchedule(){
 	link.click();
 }
 
+function formatResultDiv() {
+	const checkboxes = document.querySelectorAll('.class-checkbox');
+	
+	checkboxes.forEach(checkbox => {
+		const courseElement = checkbox.closest('.course-selection');
+		if (courseElement && !checkbox.checked) {
+			courseElement.remove();
+		}
+	});
+	
+	const errorMessage = document.getElementById("Search_Error");
+	if (errorMessage){
+		errorMessage.remove();
+	}
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     const availableClasses = [
         { name: "ACAD 182", type: "Lecture", day: "Monday", start: "10:00", end: "11:50" },
@@ -105,17 +121,24 @@ document.addEventListener("DOMContentLoaded", function() {
                 return response.json();
             })
             .then(data => {
+				
                 db_data = data;
+				
+				// clear unchecked boxes or previous error <p>,
+				// keep checked (selected) boxes.
+				formatResultDiv();
                 
                 const resultDiv = document.getElementById("searchResults");
-                
+				
                 for (let i = 0; i < data.length; i++) {
                     const key = Object.keys(data[i])[0];
                     const courseDetails = data[i][key];
                     
                     // Handle case with no results 
                     if (i == 0 && courseDetails == "No Classes Found."){
-                        resultDiv.innerHTML = "<p>No Classes Found.</p>";
+						const tempDiv = document.createElement('div');
+						tempDiv.innerHTML = `<p id = "Search_Error">No Classes Found.</p>`;
+						resultDiv.appendChild(tempDiv.firstElementChild);
                         return;
                     }
                     
@@ -149,21 +172,24 @@ document.addEventListener("DOMContentLoaded", function() {
                             || courseDetails[5] == "Dis") {
                         color = "rgb(205, 241, 247)";
                     }
-                    
-                    // TODO: Add class="class-checkbox" to input tag once feature is implimented
-                    // to add searched classes to schedule.
-                    const display = `<div class="course-selection" style="background-color: ${color};">
-                                        <input type="checkbox" id="${courseDetails[0]}" class = "class-checkbox" name="${courseDetails[0]}" value="${courseDetails[1]} $ ${courseDetails[5]} $ ${days} $ ${courseDetails[7]}">
-                                            <label for="${courseDetails[0]}">
-                                                <strong>${courseDetails[1]}: ${courseDetails[2]}<br><br>
-                                                
-                                                ${courseDetails[9]}</strong><br><br>
-                                                <i>${courseDetails[5]}, ${courseDetails[0]},<br>
-                                                ${days}; ${courseDetails[7]}</i>
-                                            </label>
-                                    </div>`;
-                    
-                    resultDiv.innerHTML += display;
+
+					const tempDiv = document.createElement('div');
+					
+					tempDiv.innerHTML = `
+					    <div class="course-selection" style="background-color: ${color};">
+					        <input type="checkbox" id="${courseDetails[0]}" class="class-checkbox" 
+					               name="${courseDetails[0]}" 
+					               value="${courseDetails[1]} $ ${courseDetails[5]} $ ${days} $ ${courseDetails[7]} $ ${courseDetails[0]}">
+					        <label for="${courseDetails[0]}">
+					            <strong>${courseDetails[1]}: ${courseDetails[2]}<br><br>
+					            ${courseDetails[9]}</strong><br><br>
+					            <i>${courseDetails[5]}, ${courseDetails[0]},<br>
+					            ${days}; ${courseDetails[7]}</i>
+					        </label>
+					    </div>
+					`;
+
+					resultDiv.appendChild(tempDiv.firstElementChild);
                     
                     //console.log(`Course ${i + 1}:`);
                     //console.log(`ID: ${courseDetails[0]}`);
@@ -180,7 +206,10 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => {
                 console.error('Error:', error);
                 const resultDiv = document.getElementById("searchResults");
-                resultDiv.innerHTML = '<p>An unexpected error occurred.</p>';
+				
+				const tempDiv = document.createElement('div');
+				tempDiv.innerHTML = '<p id = "Search_Error">An unexpected error occurred.</p>';
+				resultDiv.appendChild(tempDiv.firstElementChild);
             });
         }
     });
@@ -193,6 +222,13 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("submit-unavailable").addEventListener("click", function() {
         renderUnavailableTimes();
     });
+	
+	function uncheckCheckBox(id) {
+	    const checkbox = document.getElementById(id);
+	    if (checkbox) {
+	        checkbox.checked = false;
+	    }
+	}
 
     function renderSchedule(selectedClasses) {
         //clear any prev schedules displayed
@@ -206,6 +242,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const days = parts[2];
             const timeRange = parts[3];
             const [startTime, endTime] = timeRange.split("-");
+			const id = parts[4];
             
             const st = parseTime(startTime);
             const et = parseTime(endTime);
@@ -222,6 +259,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 const classDiv = document.createElement("div");
                 classDiv.classList.add("class-cell");
+				classDiv.classList.add(id);
                 classDiv.textContent = `${name} ${type}`;
                 classDiv.style.top = `${(startOffset / 60) * 80}px`;
                 classDiv.style.height = `${(duration / 60) * 80}px`;
@@ -253,10 +291,20 @@ document.addEventListener("DOMContentLoaded", function() {
                     overlay.style.opacity = "0";
                 });
                 
-                // Click event to remove
-                classDiv.addEventListener("click", () => {
-                    scheduleContainer.removeChild(classDiv);
-                });
+				classDiv.addEventListener("click", () => {
+				    // Find the id class name
+				    const class_id = Array.from(classDiv.classList).find(cls => cls !== "class-cell");
+				    
+				    if (class_id) {
+				        const escapedClassName = CSS.escape(class_id);
+				        const elementsToRemove = scheduleContainer.querySelectorAll(`.${escapedClassName}`);
+				        elementsToRemove.forEach(element => {
+				            scheduleContainer.removeChild(element);
+				        });
+				    }
+					
+					uncheckCheckBox(class_id);
+				});
                 
                 classDiv.appendChild(overlay);
                 
