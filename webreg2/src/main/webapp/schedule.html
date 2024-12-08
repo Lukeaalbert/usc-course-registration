@@ -17,11 +17,36 @@
             align-items: flex-start;
             overflow-y: auto;
         }
+       
+        .nav-bar {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-bar a {
+            text-decoration: none;
+            color: white;
+            margin-left: 20px;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-bar a:hover {
+            color: #ddd;
+        }
 
         .container {
             display: flex;
             width: 1200px;
-            margin: 20px 0;
+            margin: 80px 0; 
         }
         .form-container {
             width: 300px;
@@ -157,9 +182,33 @@
             margin-right: 10px;
         }
     </style>
+    <script>
+        
+        function updateNavBar() {
+            const navBar = document.querySelector('.nav-bar');
+            if (localStorage.getItem('logged-in') === 'yes') {
+                navBar.innerHTML = '<a href="#" onclick="signOut()">Sign Out</a>';
+            } else {
+                navBar.innerHTML = '<a href="login.html">Login</a><a href="register.html">Register</a>';
+            }
+        }
+
+       
+        function signOut() {
+            localStorage.removeItem('logged-in');
+            localStorage.removeItem('user_id');
+            window.location.href = 'login.html';
+        }
+
+        
+        window.onload = updateNavBar;
+    </script>
     
 </head>
 <body>
+	
+     <div class="nav-bar"></div>
+
     <div class="container">
         <div class="form-container">
             <h3>Class Search</h3>
