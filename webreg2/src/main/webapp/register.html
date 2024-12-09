@@ -10,10 +10,34 @@
             font-family: Arial, sans-serif;
             background-color: #f4fff6;
             display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
             margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-bar {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-bar a {
+            text-decoration: none;
+            color: white;
+            margin-left: 20px;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-bar a:hover {
+            color: #ddd;
         }
 
         .register-container {
@@ -23,6 +47,7 @@
             border-radius: 10px;
             width: 300px;
             text-align: center;
+            margin-top: 50px;
         }
 
         .register-container h2 {
@@ -89,6 +114,11 @@
 </head>
 
 <body>
+    <div class="nav-bar">
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+    </div>
+
     <form class="register-container" onsubmit="validateSignUp(event)">
         <h2>Create Account</h2>
         <input type="text" id="username" placeholder="Username" required><br>
