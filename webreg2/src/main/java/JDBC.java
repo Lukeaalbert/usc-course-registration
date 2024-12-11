@@ -17,7 +17,7 @@ public class JDBC {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             // change your schema here
-            String connection_url = "jdbc:mysql://localhost:3306/final_proj?user=" + username + 
+            String connection_url = "jdbc:mysql://localhost:3306/fall2024?user=" + username + 
                                  "&password=" + password +
                                  "&useSSL=false&allowPublicKeyRetrieval=true";
 
@@ -126,15 +126,20 @@ public class JDBC {
 //    }
 
 
-//    private static void createUserTable() {
-//        try {
-//            String sql = "CREATE TABLE users ("
-//                         + "id INT PRIMARY KEY auto_increment,"
-//                         + "username VARCHAR(100),"
-//                         + "email VARCHAR(100),"
-//                         + "password VARCHAR(100));"
-//            stmt.executeUpdate(sql);
-//    }
+   public static void createUserTable() {
+
+           String sql = "CREATE TABLE users ("
+                       + "id INT PRIMARY KEY auto_increment,"
+                       + "username VARCHAR(100),"
+                       + "email VARCHAR(100),"
+                       + "password VARCHAR(100));";
+            try {
+				stmt.executeUpdate(sql);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+   }
 
     // insert a user into database, assume users is a table with (id INT PRIMARY KEY, username VARCHAR(100), email VARCHAR(100), password VARCHAR(100))
     public static boolean insertUser(String username, String email, String password){

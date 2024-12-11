@@ -9,7 +9,7 @@ public class Authenticator {
 	public Authenticator() throws IOException{
 		if(!JDBC.hasConnection())
 			// REPLACE connection username
-			JDBC.establishJDBCConnection("root", "temp_pass123");
+			JDBC.establishJDBCConnection("root", "password!");
         if(!JDBC.hasConnection())
         	throw new IOException("There is no connection to database");
 	}

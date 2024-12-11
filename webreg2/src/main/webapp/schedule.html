@@ -187,17 +187,28 @@
         function updateNavBar() {
             const navBar = document.querySelector('.nav-bar');
             if (localStorage.getItem('logged-in') === 'yes') {
+            	const username = localStorage.getItem("user_id");
+            	if (username == "undefined") {
+            		document.getElementById("bar123").innerHTML="Google User's Perfect Schedule";
+            	}
+            	else {
+            		document.getElementById("bar123").innerHTML=`${username}'s Perfect Schedule`;
+            	}
                 navBar.innerHTML = '<a href="#" onclick="signOut()">Sign Out</a>';
             } else {
+            	document.getElementById("theMoButton").style.display = "none";
+            	document.getElementById("bar123").innerHTML="Guest's Perfect Schedule";
                 navBar.innerHTML = '<a href="login.html">Login</a><a href="register.html">Register</a>';
             }
         }
 
        
         function signOut() {
+        	document.getElementById("theMoButton").style.display = "none";
+        	document.getElementById("bar123").innerHTML="Guest's Perfect Schedule";
             localStorage.removeItem('logged-in');
             localStorage.removeItem('user_id');
-            window.location.href = 'login.html';
+            location.reload();
         }
 
         
@@ -220,22 +231,6 @@
         	</div>
     	</div>
             <div class="form-section">
-                <h3>Required Courses</h3>
-                <label>Select Required Courses:</label>
-                <div class="course-category">
-                    <h4>ACAD</h4>
-                    <input type="checkbox" class="class-checkbox" value="ACAD 182"> ACAD 182<br>
-                    <input type="checkbox" class="class-checkbox" value="ACAD 188"> ACAD 188<br>
-                </div>
-                <div class="course-category">
-                    <h4>AHIS</h4>
-                    <input type="checkbox" class="class-checkbox" value="AHIS 100"> AHIS 100<br>
-                </div>
-                <div class="course-category">
-                    <h4>CSCI</h4>
-                    <input type="checkbox" class="class-checkbox" value="CSCI 201"> CSCI 201<br>
-                    <input type="checkbox" class="class-checkbox" value="CSCI 270"> CSCI 270<br>
-                </div>
                 <button id="submit-classes">Submit</button>
             </div>
             <div class="form-section">
@@ -341,7 +336,7 @@
                 </div>
                 <button id="submit-unavailable">Submit Unavailable Times</button>
             </div>
-            <div class="form-section">
+            <div class="form-section" style="display:none;">
     			<h3>Recommended Schedule</h3>
     				<ul>
 				        <li>CSCI 201 - Lecture, Lab, Quiz</li>
@@ -353,10 +348,13 @@
 			    <button onclick="window.location.href='prevschedules.html'">View Previous Schedules</button>
                 <button onclick="saveSchedule()">Save Schedules</button>
 			</div>
+			<div class="form-section" id = "theMoButton">
+			<button onclick="saveSchedule()">Save Schedules</button>
+			</div>
         </div>
         <div class="schedule-container">
             <!--to be swapped later, a local cache will be there once user logs in-->
-            <div class="schedule-header">Guest's Perfect Schedule</div>
+            <div class="schedule-header" id="bar123">Guest's Perfect Schedule</div>
             <table class="schedule-table">
                 <thead>
                     <tr>
