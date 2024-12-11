@@ -335,9 +335,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const unavailableDiv = document.createElement("div");
             unavailableDiv.classList.add("unavailable-block");
-            unavailableDiv.style.top = `${(startOffset / 60) * 80}px`;
+            unavailableDiv.style.position="absolute";
+            unavailableDiv.style.marginTop = `${(startOffset / 60) * 83 + 3}px`;
             unavailableDiv.style.height = `${(duration / 60) * 80}px`;
-            unavailableDiv.style.left = `${dayOffsets[day] * 16.5}%`;
+            unavailableDiv.style.marginLeft = `${dayOffsets[day] * 16.7 - 2}%`;
             unavailableDiv.style.width = "16%";
 
             scheduleContainer.appendChild(unavailableDiv);
