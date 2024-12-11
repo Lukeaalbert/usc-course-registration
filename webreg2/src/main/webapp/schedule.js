@@ -1,17 +1,32 @@
 /**
  * 
  */
-db_data = []
+let db_data = []
 						
 function saveSchedule(){
 	//console.log(document.getElementById("searchResults"));
-	var classes = "";
+    const now = new Date();
+
+    // Define options for formatting date and time
+    const options = {
+    year: 'numeric',        // e.g., 2023
+    month: '2-digit',       // e.g., 04
+    day: '2-digit',         // e.g., 27
+    hour: '2-digit',        // e.g., 03
+    minute: '2-digit',      // e.g., 24
+    second: '2-digit',      // e.g., 15
+    hour12: true,           // Use 12-hour format (AM/PM)
+    timeZoneName: 'short'   // e.g., GMT, PDT
+    };
+
+	var classes = `${localStorage.getItem("user_id")}'s saved schedule at ${now.toLocaleString(undefined, options)}\n\n`;
 	
 	var div = document.getElementById('searchResults');
 	var divs = div.getElementsByTagName('div');
 	for (var i = 0; i < divs.length; i += 1) {
 		const element = divs[i];
 		if(element.childNodes[1].checked){
+            console.log(db_data);
 			var courseDetails = db_data[i][Object.keys(db_data[i])[0]];
 			classes += courseDetails[1] + ": " + courseDetails[2] + "\n";
 			classes += courseDetails[5] + ", " + courseDetails[0] + "\n";
@@ -94,7 +109,7 @@ async function getClassesFromBackend(){
         })
         .then(data => {
             
-            db_data = data;
+            db_data = db_data.concat(data);
             
             // clear unchecked boxes or previous error <p>,
             // keep checked (selected) boxes.
@@ -105,6 +120,11 @@ async function getClassesFromBackend(){
             for (let i = 0; i < data.length; i++) {
                 const key = Object.keys(data[i])[0];
                 const courseDetails = data[i][key];
+                //courseDetails[0]
+
+                if (document.getElementById(courseDetails[0])) {
+                    continue;
+                }
                 
                 // Handle case with no results 
                 if (i == 0 && courseDetails == "No Classes Found."){
@@ -151,7 +171,8 @@ async function getClassesFromBackend(){
                     <div class="course-selection" style="background-color: ${color};">
                         <input type="checkbox" id="${courseDetails[0]}" class="class-checkbox" 
                                name="${courseDetails[0]}" 
-                               value="${courseDetails[1]} $ ${courseDetails[5]} $ ${days} $ ${courseDetails[7]} $ ${courseDetails[0]}">
+                               value="${courseDetails[1]} $ ${courseDetails[5]} $ ${days} $ ${courseDetails[7]} $ ${courseDetails[0]}"
+                               id="${courseDetails[0]}">
                         <label for="${courseDetails[0]}">
                             <strong>${courseDetails[1]}: ${courseDetails[2]}<br><br>
                             ${courseDetails[9]}</strong><br><br>
@@ -186,35 +207,171 @@ async function getClassesFromBackend(){
     }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    const availableClasses = [
-        { name: "ACAD 182", type: "Lecture", day: "Monday", start: "10:00", end: "11:50" },
-        { name: "AHIS 100", type: "Lecture", day: "Tuesday", start: "9:30", end: "10:50" },
-        { name: "CSCI 201", type: "Lecture", day: "Tuesday", start: "11:00", end: "12:20" },
-        { name: "CSCI 201", type: "Lab", day: "Tuesday", start: "14:00", end: "15:50" },
-        { name: "ACAD 188", type: "Lecture", day: "Tuesday", start: "16:00", end: "17:50" },
-        { name: "CSCI 270", type: "Lecture", day: "Monday", start: "15:30", end: "16:50" },
-        { name: "ACAD 182", type: "Lecture", day: "Wednesday", start: "10:00", end: "11:50" },
-        { name: "CSCI 270", type: "Lecture", day: "Wednesday", start: "15:30", end: "16:50" },
-        { name: "AHIS 100", type: "Lecture", day: "Thursday", start: "9:30", end: "10:50" },
-        { name: "CSCI 201", type: "Lecture", day: "Thursday", start: "11:00", end: "12:20" },
-        { name: "AHIS 100", type: "Discussion", day: "Friday", start: "11:00", end: "11:50" },
-        { name: "CSCI 270", type: "Discussion", day: "Friday", start: "12:00", end: "13:50" }
-    ];
+function parseTime(timeString) {
+    const [hours, minutes] = timeString.split(":").map(Number);
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return date;
+}
 
-    const scheduleContainer = document.querySelector(".schedule-container");
-    const dayOffsets = {
-        "M": 1,
-        "T": 2,
-        "W": 3,
-        "TH": 4,
-        "F": 5
-    };
+	
+function uncheckCheckBox(id) {
+    const checkbox = document.getElementById(id);
+    if (checkbox) {
+        checkbox.checked = false;
+    }
+}
+
+function renderSchedule(selectedClasses) {
+    //clear any prev schedules displayed
+    var scheduleContainer = document.querySelector(".schedule-container")
+    const cells = scheduleContainer.querySelectorAll(".class-cell");
+    if (cells && cells.length) {
+        cells.forEach(cell => cell.remove());
+    }
+    
+    for (let i = 0; i < selectedClasses.length; i++) {
+        const parts = selectedClasses[i].split(" $ ");
+
+        const name = parts[0];
+        const type = parts[1];
+        const days = parts[2];
+        const timeRange = parts[3];
+        const [startTime, endTime] = timeRange.split("-");
+        const id = parts[4];
+        
+        const st = parseTime(startTime);
+        const et = parseTime(endTime);
+        
+        const duration = (et - st) / (1000 * 60); // duration in minutes
+        const startOffset = (st.getHours() - 8) * 60 + st.getMinutes();
+        
+        console.log("days " + days);
+        
+        const dayArray = days.split(", ");
+
+        for (let i = 0; i < dayArray.length; i++) {
+            const day = dayArray[i];
+
+            const classDiv = document.createElement("div");
+            classDiv.classList.add("class-cell");
+            classDiv.id = `in-calendar-${id}`;
+            classDiv.textContent = `${name} ${type}`;
+            classDiv.style.top = `${(startOffset / 60) * 80}px`;
+            classDiv.style.height = `${(duration / 60) * 80}px`;
+            classDiv.style.left = `${dayOffsets[day] * 16.5}%`;
+            classDiv.style.width = "16%";
+            
+            // Create overlay element
+            const overlay = document.createElement("div");
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.display = "none";
+            overlay.style.justifyContent = "center";
+            overlay.style.alignItems = "center";
+            overlay.style.color = "white";
+            overlay.style.fontWeight = "bold";
+            
+            classDiv.addEventListener("mouseenter", () => {
+                classDiv.style.transition = "background-color 0.3s ease-in-out";
+                classDiv.style.backgroundColor = "red";
+                overlay.style.opacity = "1";
+                overlay.style.display = "flex";
+            });
+
+            classDiv.addEventListener("mouseleave", () => {
+                classDiv.style.backgroundColor = ""; // Reset to original color
+                overlay.style.backgroundColor = "rgba(255, 0, 0, 0)";
+                overlay.style.opacity = "0";
+            });
+            
+            classDiv.addEventListener("click", () => {
+                var class_id = id;
+                if(class_id){
+                    var element = document.getElementById(`in-calendar-${class_id}`);
+                    while(element){
+                        scheduleContainer.removeChild(element);
+                        element = document.getElementById(`in-calendar-${class_id}`);
+                    }
+                }
+                uncheckCheckBox(class_id);
+            });
+            
+            classDiv.appendChild(overlay);
+            
+            scheduleContainer.appendChild(classDiv);
+        }
+    }
+    
+}
+
+const dayOffsets = {
+    "M": 1,
+    "T": 2,
+    "W": 3,
+    "TH": 4,
+    "F": 5
+};
+
+document.addEventListener("DOMContentLoaded", function() {
     
     // search for classes
     document.getElementById('searchForm').addEventListener('submit', function(event) {
         event.preventDefault();
         getClassesFromBackend();
+    });
+
+    document.getElementById("optimize-button").addEventListener("click", function(){
+        // var wantedClasses = [
+        //     {
+        //         "deptName": "CSCI",
+        //         "classID": "201"
+        //     },
+        //     {
+        //         "deptName": "CSCI",
+        //         "classID": "270"
+        //     },
+        //     {
+        //         "deptName": "ITP",
+        //         "classID": "303"
+        //     },
+        //     {
+        //         "deptName": "ITP",
+        //         "classID": "342"
+        //     },
+        //     {
+        //         "deptName": "PHED",
+        //         "classID": "110"
+        //     }
+        // ];
+
+        // var wantedClasses = ['29904R', '30028R', '30107R', '30108R', '30134R', 
+        //     '30237R', '30238R', '30239R', '30241R', '30385R', '30389D', '30396R', 
+        //     '29994D', '30029R', '30109R', '30190R', '30222R', '30245R', '30294R', 
+        //     '30361R', '30362R', '30363R', '19880R', '19881R', '19882R', '19883R', 
+        //     '19884R', '19885R', '19886R', '49739R', '49740R', '49741R', '49743R', 
+        //     '49744R', '49746R', '50420R', '50421R', '50426R', '50427R', '50428R', 
+        //     '50429R', '50430R'];
+
+        let wantedClasses = [];
+	
+        var div = document.getElementById('searchResults');
+        var divs = div.getElementsByTagName('div');
+        for (var i = 0; i < divs.length; i += 1) {
+            const element = divs[i];
+            if(element.childNodes[1].checked){
+                var sessionID = db_data[i][Object.keys(db_data[i])[0]][0];
+                wantedClasses.push(sessionID);
+            }
+        }
+        
+        console.log("AAAAAAAAA", wantedClasses);
+        // optimizeSchedule(wantedClasses); 
     });
 
     document.getElementById("put-on-calendar").addEventListener("click", function() {
@@ -226,99 +383,9 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("submit-unavailable").addEventListener("click", function() {
         renderUnavailableTimes();
     });
-	
-	function uncheckCheckBox(id) {
-	    const checkbox = document.getElementById(id);
-	    if (checkbox) {
-	        checkbox.checked = false;
-	    }
-	}
-
-    function renderSchedule(selectedClasses) {
-        //clear any prev schedules displayed
-        scheduleContainer.querySelectorAll(".class-cell").forEach(cell => cell.remove());
-        
-        for (let i = 0; i < selectedClasses.length; i++) {
-            const parts = selectedClasses[i].split(" $ ");
-
-            const name = parts[0];
-            const type = parts[1];
-            const days = parts[2];
-            const timeRange = parts[3];
-            const [startTime, endTime] = timeRange.split("-");
-			const id = parts[4];
-            
-            const st = parseTime(startTime);
-            const et = parseTime(endTime);
-            
-            const duration = (et - st) / (1000 * 60); // duration in minutes
-            const startOffset = (st.getHours() - 8) * 60 + st.getMinutes();
-            
-            console.log("days " + days);
-            
-            const dayArray = days.split(", ");
-
-            for (let i = 0; i < dayArray.length; i++) {
-                const day = dayArray[i];
-
-                const classDiv = document.createElement("div");
-                classDiv.classList.add("class-cell");
-				classDiv.classList.add(id);
-                classDiv.textContent = `${name} ${type}`;
-                classDiv.style.top = `${(startOffset / 60) * 80}px`;
-                classDiv.style.height = `${(duration / 60) * 80}px`;
-                classDiv.style.left = `${dayOffsets[day] * 16.5}%`;
-                classDiv.style.width = "16%";
-                
-                // Create overlay element
-                const overlay = document.createElement("div");
-                overlay.style.top = "0";
-                overlay.style.left = "0";
-                overlay.style.width = "100%";
-                overlay.style.height = "100%";
-                overlay.style.display = "none";
-                overlay.style.justifyContent = "center";
-                overlay.style.alignItems = "center";
-                overlay.style.color = "white";
-                overlay.style.fontWeight = "bold";
-                
-                classDiv.addEventListener("mouseenter", () => {
-                    classDiv.style.transition = "background-color 0.3s ease-in-out";
-                    classDiv.style.backgroundColor = "red";
-                    overlay.style.opacity = "1";
-                    overlay.style.display = "flex";
-                });
-
-                classDiv.addEventListener("mouseleave", () => {
-                    classDiv.style.backgroundColor = ""; // Reset to original color
-                    overlay.style.backgroundColor = "rgba(255, 0, 0, 0)";
-                    overlay.style.opacity = "0";
-                });
-                
-				classDiv.addEventListener("click", () => {
-				    // Find the id class name
-				    const class_id = Array.from(classDiv.classList).find(cls => cls !== "class-cell");
-				    
-				    if (class_id) {
-				        const escapedClassName = CSS.escape(class_id);
-				        const elementsToRemove = scheduleContainer.querySelectorAll(`.${escapedClassName}`);
-				        elementsToRemove.forEach(element => {
-				            scheduleContainer.removeChild(element);
-				        });
-				    }
-					
-					uncheckCheckBox(class_id);
-				});
-                
-                classDiv.appendChild(overlay);
-                
-                scheduleContainer.appendChild(classDiv);
-            }
-        }
-        
-    }
 
     function renderUnavailableTimes() {
+        var scheduleContainer = document.querySelector(".schedule-container");
         //clear prev greyed out times
         scheduleContainer.querySelectorAll(".unavailable-block").forEach(block => block.remove());
 
@@ -344,17 +411,6 @@ document.addEventListener("DOMContentLoaded", function() {
             scheduleContainer.appendChild(unavailableDiv);
         });
     }
-
-    function parseTime(timeString) {
-        const [hours, minutes] = timeString.split(":").map(Number);
-        const date = new Date();
-        date.setHours(hours);
-        date.setMinutes(minutes);
-        date.setSeconds(0);
-        date.setMilliseconds(0);
-        return date;
-    }
-
     //dropdown visibility
     document.querySelectorAll(".day-section h4").forEach(header => {
         header.addEventListener("click", function() {
@@ -363,3 +419,71 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+// OPTIMIZE
+
+function convertClassesToStrings(returnedClasses) {
+    const dayMap = {
+        0: "M",
+        1: "T",
+        2: "W",
+        3: "TH",
+        4: "F"
+    };
+
+    const formattedClasses = [];
+
+    returnedClasses.forEach(classItem => {
+        const { name, type, dClassCode, id, startTime, endTime, dates } = classItem;
+
+        // Helper function to format time with leading zeros
+        const formatTime = (time) => {
+            const hour = String(time.hour).padStart(2, '0');
+            const minute = String(time.minute).padStart(2, '0');
+            return `${hour}:${minute}`;
+        };
+
+        const start = formatTime(startTime);
+        const end = formatTime(endTime);
+        const timeRange = `${start}-${end}`;
+        const idWithCode = `${id}${dClassCode}`;
+
+        dates.forEach((flag, index) => {
+            if (flag === 1) {
+                const day = dayMap[index];
+                const formattedString = `${name} $ ${type} $ ${day} $ ${timeRange} $ ${idWithCode}`;
+                formattedClasses.push(formattedString);
+            }
+        });
+    });
+
+    return formattedClasses;
+}
+
+
+async function optimizeSchedule(wantedClasses1) {
+    console.log(wantedClasses1);
+
+    try {
+        const response = await fetch('AlgorithmServlet', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({selectedClasses: wantedClasses1,})
+        });
+
+        const parsedMsg = await response.json();
+        if (!response.ok) {
+            console.log(`${parsedMsg}`);
+            throw new Error(`${parsedMsg}`);
+        }
+        else {
+            console.log(parsedMsg);
+            var selectedClasses = convertClassesToStrings(parsedMsg);
+            renderSchedule(selectedClasses);
+
+            // clears prev schedule; now need to uncheck the boxes for unselected courses
+        }
+    }
+    catch (error) {
+        console.log(error);
+    }
+}

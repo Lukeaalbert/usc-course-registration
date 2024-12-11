@@ -225,12 +225,8 @@
             const navBar = document.querySelector('.nav-bar');
             if (localStorage.getItem('logged-in') === 'yes') {
             	const username = localStorage.getItem("user_id");
-            	if (username == "undefined") {
-            		document.getElementById("bar123").innerHTML="Google User's Perfect Schedule";
-            	}
-            	else {
-            		document.getElementById("bar123").innerHTML=`${username}'s Perfect Schedule`;
-            	}
+            	document.getElementById("bar123").innerHTML=`${username}'s Perfect Schedule`;
+            	
                 navBar.innerHTML = '<a href="#" onclick="signOut()">Sign Out</a>';
             } else {
             	document.getElementById("theMoButton").style.display = "none";

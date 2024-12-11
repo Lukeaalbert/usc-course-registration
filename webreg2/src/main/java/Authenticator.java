@@ -45,8 +45,10 @@ public class Authenticator {
 	public String register(String username, String email, String password) {
 
 		Vector<String> result = JDBC.getUser(username);
-		if(result.size() > 1)
+		if(result.size() > 1) {
+			user_id = result.get(1);
 			return "username already exists";
+		}	
 		
 		boolean register = JDBC.insertUser(username, email, password);
 		if(register) {

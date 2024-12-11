@@ -148,6 +148,7 @@
             })
                 .then(response => { return response.json(); })
                 .then(result => {
+                    console.log(result);
                     if (result.message === "registraton successful") {
                         localStorage.setItem("logged-in", "yes");
                         localStorage.setItem("user_id", result.user_id);
@@ -184,7 +185,7 @@
         <p>-----or-----</p>
         <div>
             <div id="g_id_onload"
-                data-client_id="1061989239637-jibvkkiriifcpksur8g29tr7qn29g7ap.apps.googleusercontent.com"
+                data-client_id="1075123517462-tuqsah6gsugtqjbfr7336mbk2ahdd2vh.apps.googleusercontent.com"
                 data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse"
                 data-auto_prompt="false">
             </div>
