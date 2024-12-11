@@ -1,0 +1,8 @@
+# Database Connection Properties
+# Create a seperate file in this directory named
+# "database_properties.txt" with your creds.
+
+url=jdbc:mysql://localhost:3306
+username=root
+password=temp_pass123
+dbname=final_proj

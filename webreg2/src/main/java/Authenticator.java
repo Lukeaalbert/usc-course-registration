@@ -6,10 +6,10 @@ public class Authenticator {
 	// login
 	// logout
 	// register
-	public Authenticator() throws IOException{
+	public Authenticator(String username, String password, String schema) throws IOException{
 		if(!JDBC.hasConnection())
 			// REPLACE connection username
-			JDBC.establishJDBCConnection("root", "password!");
+			JDBC.establishJDBCConnection(username, password, schema);
         if(!JDBC.hasConnection())
         	throw new IOException("There is no connection to database");
 	}
@@ -70,14 +70,4 @@ public class Authenticator {
 		return "deletion successful";
 	}
 	
-	public static void main(String args[]) {
-		try {
-			JDBC database = new JDBC();
-			database.establishJDBCConnection("root", "temp_pass123");
-			Authenticator a = new Authenticator();
-			System.out.println(a.deleteAccount("user2"));
-		}catch(IOException e) {
-			System.out.println(e.getMessage());
-		}
-	}
 }

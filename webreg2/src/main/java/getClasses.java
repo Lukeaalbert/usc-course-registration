@@ -1,6 +1,5 @@
 import jakarta.servlet.ServletException;
 
-
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -125,8 +124,10 @@ public class getClasses extends HttpServlet {
         // TODO: check that user_search isn't empty and is correctly formatted
         // on front end.
         String user_search = request.getParameter("user_search");
+        System.out.println("Request, received");
         
         JSONArray classMatches = getClasesFromSearch(user_search);
+        System.out.println(classMatches.toString());
         
         if (classMatches == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

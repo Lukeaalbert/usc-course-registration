@@ -75,6 +75,16 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .submit-classes{
+        	padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+        }
         .schedule-container {
             max-width: 1000px;
             width: 100%;
@@ -181,6 +191,26 @@
         .course-selection input[type="checkbox"] {
             margin-right: 10px;
         }
+        #searchResults{
+            max-height: 600px;
+            overflow: auto;
+        }
+        #searchResults::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #searchResults::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2); 
+            border-radius: 4px;
+            border: none; 
+        }
+        #button-container{
+            margin-top: 10px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center; 
+            align-items: center;
+            gap: 5%;
+        }
     </style>
     <script>
         
@@ -224,15 +254,18 @@
         <div class="form-container">
             <h3>Class Search</h3>
     	<div class="search-container">
-        	<form id="searchForm" class="search-form" action="/getClasses" method="POST">
+        	<form id="searchForm" class="search-form">
             	<input type="text" name="query" class="search-input" placeholder="CLAS-151" required>
         	</form>
         	<div id = "searchResults">
         	</div>
-    	</div>
-            <div class="form-section">
-                <button id="submit-classes">Submit</button>
+        	<div id="button-container">
+                <input class="submit-classes" onclick="getClassesFromBackend();" type="submit" value="Get Classes">
+                <input id="put-on-calendar" class="submit-classes" type="submit" value="Put On Calendar">
             </div>
+            
+    	</div>
+            
             <div class="form-section">
                 <h3>Personal Preferences</h3>
                 <label>Select Unavailable Times:</label>
