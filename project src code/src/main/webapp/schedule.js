@@ -26,7 +26,7 @@ function saveSchedule(){
 	for (var i = 0; i < divs.length; i += 1) {
 		const element = divs[i];
 		if(element.childNodes[1].checked){
-            console.log(db_data);
+            //console.log(db_data);
 			var courseDetails = db_data[i][Object.keys(db_data[i])[0]];
 			classes += courseDetails[1] + ": " + courseDetails[2] + "\n";
 			classes += courseDetails[5] + ", " + courseDetails[0] + "\n";
@@ -53,7 +53,7 @@ function saveSchedule(){
 		}
 	  
 	}
-	console.log(classes);
+	//console.log(classes);
 	
 	// Create a Blob containing the string "hello"
 	const blob = new Blob([classes], { type: "text/plain" });
@@ -249,7 +249,7 @@ function renderSchedule(selectedClasses) {
         const duration = (et - st) / (1000 * 60); // duration in minutes
         const startOffset = (st.getHours() - 8) * 60 + st.getMinutes();
         
-        console.log("days " + days);
+        //console.log("days " + days);
         
         const dayArray = days.split(", ");
 
@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById("put-on-calendar").addEventListener("click", function() {
         const selectedClasses = Array.from(document.querySelectorAll(".class-checkbox:checked")).map(checkbox => checkbox.value);
-		console.log(selectedClasses);
+		//console.log(selectedClasses);
         renderSchedule(selectedClasses);
     });
 
@@ -400,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function() {
 // OPTIMIZE
 
 function convertClassesToStrings(returnedClasses) {
-    const dayMap = {
+    var dayMap = {
         0: "M",
         1: "T",
         2: "W",
@@ -408,32 +408,40 @@ function convertClassesToStrings(returnedClasses) {
         4: "F"
     };
 
-    const formattedClasses = [];
+    var formattedClasses = [];
 
     returnedClasses.forEach(classItem => {
-        const { name, type, dClassCode, id, startTime, endTime, dates } = classItem;
+        var { name, type, dClassCode, id, startTime, endTime, dates } = classItem;
 
         // Helper function to format time with leading zeros
-        const formatTime = (time) => {
-            const hour = String(time.hour).padStart(2, '0');
-            const minute = String(time.minute).padStart(2, '0');
+        var formatTime = (time) => {
+            var hour = String(time.hour).padStart(2, '0');
+            var minute = String(time.minute).padStart(2, '0');
             return `${hour}:${minute}`;
         };
 
-        const start = formatTime(startTime);
-        const end = formatTime(endTime);
-        const timeRange = `${start}-${end}`;
-        const idWithCode = `${id}${dClassCode}`;
+        var start = formatTime(startTime);
+        var end = formatTime(endTime);
+        var timeRange = `${start}-${end}`;
 
         dates.forEach((flag, index) => {
             if (flag === 1) {
-                const day = dayMap[index];
-                const formattedString = `${name} $ ${type} $ ${day} $ ${timeRange} $ ${idWithCode}`;
+                var day = dayMap[index];
+                var formattedString = `${name} $ ${type} $ ${day} $ ${timeRange} $ ${id}`;
                 formattedClasses.push(formattedString);
             }
         });
     });
 
+    return formattedClasses;
+}
+
+function convertClassesToIDs(returnedClasses) {
+
+    var formattedClasses = [];
+    returnedClasses.forEach(classItem => {
+        formattedClasses.push(classItem.id);
+    });
     return formattedClasses;
 }
 
@@ -453,11 +461,19 @@ async function optimizeSchedule(wantedClasses1) {
             throw new Error(`${parsedMsg}`);
         }
         else {
-            console.log(parsedMsg);
+            //console.log(parsedMsg);
             var selectedClasses = convertClassesToStrings(parsedMsg);
-            renderSchedule(selectedClasses);
+            var selectedIDs = convertClassesToIDs(parsedMsg);
+            // console.log(selectedIDs);
+            document.querySelectorAll(".class-checkbox").forEach(box => {
+                // console.log(typeof box.id);
+                if (!selectedIDs.includes(box.id)) {
+                    box.checked = false;
+                }
+            });
 
-            // clears prev schedule; now need to uncheck the boxes for unselected courses
+            renderSchedule(selectedClasses);
+            
         }
     }
     catch (error) {
