@@ -54,4 +54,4 @@ Multithreading: Web-based project (web server implements multi threading).
 
 Networking: Used in proper interlayer communication between database and server, also frontend and backend connection for Servlets
 
-User Login Functionality: When user is signed-in, their schedule is personalized with their name.
+User Login Functionality: When user is signed-in, their schedule is personalized with their name and they can save their schedule to a txt.
