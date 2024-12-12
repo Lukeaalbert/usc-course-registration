@@ -8,7 +8,8 @@ Satwika Vemuri (vemurina@usc.edu), Edward Shao (shaoe@usc.edu).
 
 ### changes needed for authentication to work:
 1. add the jar files (GSON and JDBC connector)
-2. make sure you have a users table like this; else drop it and run JDBC.createUserTable()
+2. change the dbProperties.txt to your username, password, and schema
+3. make sure you have a users table like this; else drop it and run JDBC.createUserTable()
 ```sql
 CREATE TABLE users (
     id INT PRIMARY KEY auto_increment,
