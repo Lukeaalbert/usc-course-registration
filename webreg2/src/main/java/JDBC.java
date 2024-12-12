@@ -241,4 +241,30 @@ public class JDBC {
     	
 		return false;
     }
+    
+    public static Vector<String> getCourse(String id){
+    	Vector<String> results = new Vector<>();
+    	try {
+    		PreparedStatement getCourseById = connection.prepareStatement("SELECT * FROM courses WHERE id = ?;");
+    		getCourseById.setString(1, id);
+    		ResultSet rs = getCourseById.executeQuery();
+        	if(!rs.next()) {
+        		results.add("course doesn't exist!");
+        	} else {
+        		results.add(rs.getString("id"));
+        		results.add(rs.getString("course_name"));
+        		results.add(rs.getString("type"));
+        		results.add(rs.getString("time"));
+        		results.add(rs.getString("day"));
+        		results.add(rs.getString("course_title"));
+        		results.add(rs.getString("course_description"));
+        	}
+        	return results;
+    	} catch(Exception e) {
+    		System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
+    	}
+    	results.add("an unknown error happened!");
+		return results;
+    }
 }

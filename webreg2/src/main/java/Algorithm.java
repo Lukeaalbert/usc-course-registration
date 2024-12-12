@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class Algorithm {
-	private ArrayList<Course> wantedClasses; 
 	
 	private List<Section> resList = Collections.synchronizedList(new ArrayList<Section>());
 	private ArrayList<Section> res = new ArrayList<Section>(resList); 
@@ -16,9 +15,8 @@ public class Algorithm {
 	private ArrayList<SubCourse> subCourses = new ArrayList<SubCourse>(subCoursesList); 
 	
 	private Integer minSecionsRequired = 0; 
+	
 	public Algorithm(ArrayList<Course> wantedClasses) {
-		super();
-		this.wantedClasses = wantedClasses;
 		
 		for (int i = 0; i < wantedClasses.size(); i++) {
 			Course currClass = wantedClasses.get(i);
@@ -105,10 +103,6 @@ public class Algorithm {
 		
 		// System.out.println(potentialSection.getStartTime().getHour() + ":" + potentialSection.getStartTime().getMinute() + "-" + potentialSection.getEndTime().getHour() + ":" + potentialSection.getEndTime().getMinute());
 		return false; 
-	}
-	
-	public static void main(String[] args) {
-		
 	}
 
 }

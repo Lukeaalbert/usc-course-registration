@@ -28,22 +28,6 @@ public class Section {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
-//	public String getTitle() {
-//		return title;
-//	}
-//
-//	public void setTitle(String title) {
-//		this.title = title;
-//	}
-
-//	public String getDescription() {
-//		return description;
-//	}
-//
-//	public void setDescription(String description) {
-//		this.description = description;
-//	}
 
 	public String getType() {
 		return type;
@@ -60,25 +44,6 @@ public class Section {
 	public void setDClassCode(String dClassCode) {
 		this.dClassCode = dClassCode; 
 	}
-	
-//	public Double getUnits() {
-//		return units;
-//	}
-//	
-//	public void setUnits(String units) {
-//		if (units == null) {
-//			this.units = null; 
-//		}
-//		
-//		else {
-//			this.units = Double.parseDouble(units); 
-//		}
-//		
-//	}
-//	
-//	public void setUnits(Double units) {
-//		this.units = units;
-//	}
 
 	public Integer getSpacesAvailable() {
 		return spacesAvailable;
@@ -130,7 +95,6 @@ public class Section {
 		this.name = name;
 	}
 	
-	
 	public void setDates(String dateString) {
 		dates = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0, 0)); 
 		
@@ -163,7 +127,6 @@ public class Section {
 		}
 	}
 	
-	
 	public Section() {
 		id = null;
 		type = null;
@@ -182,7 +145,7 @@ public class Section {
 		this.name = name; 
 		this.id = id;
 		this.type = type;
-		this.dClassCode = dClassCode;
+		this.dClassCode = "R";
 		
 //		this.setUnits(units);
 		this.setSpacesAvailable(spacesAvailable);
@@ -226,10 +189,40 @@ public class Section {
 				// System.out.println("End time: " + endHour + ":" + endMinute);
 			}
 		}
-		
-		
-
 		this.setDates(dates);
+	}
+	
+	@Override
+	public String toString() {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("Section {");
+	    sb.append(",  id: ").append(id);
+	    sb.append(",  name: ").append(name);
+	    sb.append(",  type: ").append(type);
+	    sb.append(",  D-Clearance Code: ").append(dClassCode);
+	    sb.append(",  spaces available: ").append(spacesAvailable);
+	    sb.append(",  start time: ").append(startTime.getHour() + ":" + startTime.getMinute());
+	    sb.append(",  end time: ").append(endTime.getHour() + ":" + endTime.getMinute());
+	    sb.append(",  dates: ");
+	    
+	    if (dates != null && dates.size() == 5) {
+	        String[] days = {"M", "T", "W", "H", "F"};
+	        StringBuilder daysStr = new StringBuilder();
+	        for (int i = 0; i < 5; i++) {
+	            if (dates.get(i) == 1) {
+	                if (daysStr.length() > 0) {
+	                    daysStr.append(", ");
+	                }
+	                daysStr.append(days[i]);
+	            }
+	        }
+	        sb.append(daysStr.length() > 0 ? daysStr : "None");
+	    } else {
+	        sb.append("None");
+	    }
+	    
+	    sb.append("\n}");
+	    return sb.toString();
 	}
 
 }

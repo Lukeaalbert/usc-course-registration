@@ -327,28 +327,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     document.getElementById("optimize-button").addEventListener("click", function(){
-        // var wantedClasses = [
-        //     {
-        //         "deptName": "CSCI",
-        //         "classID": "201"
-        //     },
-        //     {
-        //         "deptName": "CSCI",
-        //         "classID": "270"
-        //     },
-        //     {
-        //         "deptName": "ITP",
-        //         "classID": "303"
-        //     },
-        //     {
-        //         "deptName": "ITP",
-        //         "classID": "342"
-        //     },
-        //     {
-        //         "deptName": "PHED",
-        //         "classID": "110"
-        //     }
-        // ];
 
         // var wantedClasses = ['29904R', '30028R', '30107R', '30108R', '30134R', 
         //     '30237R', '30238R', '30239R', '30241R', '30385R', '30389D', '30396R', 
@@ -358,7 +336,7 @@ document.addEventListener("DOMContentLoaded", function() {
         //     '49744R', '49746R', '50420R', '50421R', '50426R', '50427R', '50428R', 
         //     '50429R', '50430R'];
 
-        let wantedClasses = [];
+        var wantedClasses = [];
 	
         var div = document.getElementById('searchResults');
         var divs = div.getElementsByTagName('div');
@@ -369,9 +347,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 wantedClasses.push(sessionID);
             }
         }
-        
-        console.log("AAAAAAAAA", wantedClasses);
-        // optimizeSchedule(wantedClasses); 
+
+        optimizeSchedule(wantedClasses); 
     });
 
     document.getElementById("put-on-calendar").addEventListener("click", function() {
@@ -467,7 +444,7 @@ async function optimizeSchedule(wantedClasses1) {
     try {
         const response = await fetch('AlgorithmServlet', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({selectedClasses: wantedClasses1,})
+            body: JSON.stringify(wantedClasses1)
         });
 
         const parsedMsg = await response.json();

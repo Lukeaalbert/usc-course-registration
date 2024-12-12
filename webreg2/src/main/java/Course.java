@@ -160,6 +160,33 @@ public class Course {
 		return quizSubCourse;
 	}
 	
+	@Override
+	public String toString() {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("{");
+	    
+	    // Add basic course information
+	    sb.append("name: ").append(name).append(", ");
+	    sb.append("title: ").append(title).append(", ");
+	    sb.append("description: ").append(description).append(", ");
+	    
+	    // Add section counts
+	    sb.append("numLectures: ").append(numLectures).append(", ");
+	    sb.append("numDiscussions: ").append(numDiscussions).append(", ");
+	    sb.append("numLabs: ").append(numLabs).append(", ");
+	    sb.append("numQuizes: ").append(numQuizes).append(", ");
+	    
+	    // Add sections lists
+	    sb.append("lectures: ").append(lectures).append(", ");
+	    sb.append("discussions: ").append(discussions).append(", ");
+	    sb.append("labs: ").append(labs).append(", ");
+	    sb.append("quizes: ").append(quizes).append(", ");
+	    sb.append("sections: ").append(sections);
+	    
+	    sb.append("}");
+	    return sb.toString();
+	}
+	
 	
 	public Course(String name, String title, String description, ArrayList<Section> sections) {
 		this.name = name;

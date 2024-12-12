@@ -1,5 +1,7 @@
 
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -13,7 +15,12 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * Servlet implementation class AlgorithmServlet
@@ -32,99 +39,68 @@ public class AlgorithmServlet extends HttpServlet {
 
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
+	
+	private Properties dbProperties;
+	
+	private void loadProperties() throws ServletException {
+        dbProperties = new Properties();
+        try {
+            String filePath = getServletContext().getRealPath("/WEB-INF/database_properties.txt");
+            File file = new File(filePath);
+            System.out.println(filePath);
 
+            try (FileInputStream fis = new FileInputStream(file)) {
+                dbProperties.load(fis);
+            }
+        } catch (Exception e) {
+            throw new ServletException("Error loading database properties", e);
+        }
+    }
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		PrintWriter pw = response.getWriter(); 
 		
 		response.setContentType("application/json"); 
 		response.setCharacterEncoding("UTF-8");
+		loadProperties();
+		JDBC.establishJDBCConnection(dbProperties.getProperty("username"), dbProperties.getProperty("password"),
+        		dbProperties.getProperty("dbname"));
 		
-		SelectedClasses selectedClasses = new Gson().fromJson(request.getReader(), SelectedClasses.class); 
-		
-		ArrayList<WantedClass> wantedClassesNames = selectedClasses.getClasses();
-//		for (int i = 0; i < wantedClassesNames.size(); i++) {
-//			System.out.println(wantedClassesNames.get(i).getDeptName());
+		String[] sectionIDs = new Gson().fromJson(request.getReader(), String[].class);
+//		for(String i: sectionIDs) {
+//			System.out.println(i);
 //		}
+		ArrayList<Section> allSections = new ArrayList<>();
+		for(String str: sectionIDs) {
+			Vector<String> section = JDBC.getCourse(str);
+			Section c = new Section(section.get(0), section.get(1), section.get(2), "R", "0", section.get(3).split("-")[0], section.get(3).split("-")[1], section.get(4));
+			allSections.add(c);
+		}
+		
+		Map<String, ArrayList<Section>> sectionsByName = new HashMap<>();
+
+		for (Section section : allSections) {
+		    String name = section.getName();
+		    
+		    // If the name doesn't exist in the map, create a new ArrayList
+		    if (!sectionsByName.containsKey(name)) {
+		        sectionsByName.put(name, new ArrayList<>());
+		    }
+		    
+		    // Add the section to the corresponding ArrayList
+		    sectionsByName.get(name).add(section);
+		}
 		
 		List<Course> wantedClassesSync = Collections.synchronizedList(new ArrayList<Course>());
 		ArrayList<Course> wantedClasses = new ArrayList<Course>(wantedClassesSync);
 		
-		List<Course> deptCoursesList = Collections.synchronizedList(new ArrayList<Course>()); 
-		ArrayList<Course> deptCourses = new ArrayList<Course>(deptCoursesList);
-		
-		// For each class name, I want to get the course info for that class 
-		for (int i = 0; i < wantedClassesNames.size(); i++) {
-			String currDeptName = wantedClassesNames.get(i).getDeptName(); 
-//			String currClassID = wantedClassesNames.get(i).getClassID();
-			
-			String jsonString = null; 
-			try {
-				System.out.println(currDeptName);
-				jsonString = CourseInfoFinder.getDepartmentJsonString(currDeptName, CourseInfoFinder.semester);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				System.out.println("Exception: " + e.getMessage()); 
-			}
-			
-//			System.out.println(currDeptName + " " + currClassID);
-			
-			// Address 1.0-8.0 units
-//			System.out.println(jsonString);
-			deptCourses.addAll(CourseInfoFinder.createClassMapping(jsonString)); // Throws an exception
-//			System.out.println(deptCourses.size());
-//			System.aout.println("solved");
-			
+		for(Entry<String, ArrayList<Section>> e: sectionsByName.entrySet()) {
+			Course c = new Course(e.getKey(), "", "", e.getValue());
+			wantedClasses.add(c);
 		}
 		
-		for (int i = 0; i < wantedClassesNames.size(); i++) {
-			String currDeptName = wantedClassesNames.get(i).getDeptName(); 
-			String currClassID = wantedClassesNames.get(i).getClassID();
-			String currName = currDeptName + "-" + currClassID; 
-			try {				
-				// System.out.println("finding: " + currName);
-				Boolean foundClass = false;
-				for (int j = 0; j < deptCourses.size(); j++) {
-					
-					// System.out.println(deptCourses.get(j).getName());
-					if (deptCourses.get(j).getName().trim().equals(currName.trim())) {
-						Course currCourse = deptCourses.get(j); 
-						// System.out.println(currCourse.getName() + " " + currCourse.getNumLectures());
-						wantedClasses.add(deptCourses.get(j)); 
-						
-						foundClass = true;
-						break;
-					}
-				}
-				
-				if (foundClass == false) {
-
-					// System.out.println(wantedClasses.size());
-					
-					throw new Exception("Course not found");
-				}
-				else {
-					ArrayList<Section> testSections = wantedClasses.getLast().getSections(); 
-					System.out.println(wantedClasses.getLast().getName());
-//					for (int j = 0; j < testSections.size(); j++) {
-//						System.out.println(testSections.get(j).getType() + " " + testSections.get(j).getStartTime().getHour() + ":" + testSections.get(j).getStartTime().getMinute() + "-" 
-//								+ testSections.get(j).getEndTime().getHour() + ":" + testSections.get(j).getEndTime().getMinute()); 
-//					}
-				}
-				
-			} catch (Exception e) {
-				System.out.println("Exception: " + e.getMessage()); 
-			}
-		}
-		
-		for (int i = 0; i < wantedClasses.size(); i++) {
-			System.out.println(wantedClasses.get(i).getName());
-//			for (int j = 0; j < wantedClasses.get(i).getSections().size(); j++) {
-//				Section currSection = wantedClasses.get(i).getSections().get(j);
-//				System.out.println(currSection.getType() + " - " + currSection.getStartTime().getHour() + ":" + currSection.getStartTime().getMinute() + 
-//						" - " + currSection.getEndTime().getHour() + ":" + currSection.getEndTime().getMinute()); 
-//			}
-		}
+		System.out.println(wantedClasses);
 		
 		Algorithm algorithm = new Algorithm(wantedClasses); 
 		// System.out.println(wantedClasses.size());
@@ -132,11 +108,13 @@ public class AlgorithmServlet extends HttpServlet {
 		
 		
 		ArrayList<Section> res = algorithm.getRes(); 
-		System.out.println("finished " + res.size());
 		
-		for (int j = 0; j < res.size(); j++) {
-			System.out.println(res.get(j).getType());
-		}
+//		System.out.println("finished " + res.size());
+//		
+//		for (int j = 0; j < res.size(); j++) {
+//			System.out.println(res.get(j).getType());
+//		}
+//		
 		
 		Gson gson = new Gson();
 		
