@@ -9,6 +9,7 @@ Satwika Vemuri (vemurina@usc.edu), Edward Shao (shaoe@usc.edu).
 ### 1 - pull current semester data into database
 1. run the javac files so that the web api can be invoked and semester database pulled into database
 2. this is essential for pulling into database
+3. the resulting database should be in similar structures as database dumpfile in `fall2024_courses.sql`
 
 ### 2 - drag the src/main folder into Eclipse Tomcat workspace
 1. the src/main contains all front end and backend files necessary for running the project
