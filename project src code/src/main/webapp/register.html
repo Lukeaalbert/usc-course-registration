@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4fff6;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-bar {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-bar a {
+            text-decoration: none;
+            color: white;
+            margin-left: 20px;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-bar a:hover {
+            color: #ddd;
+        }
+
+        .register-container {
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .register-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .register-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #submit-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #submit-button :hover {
+            background-color: #388E3C;
+        }
+    </style>
+    <script>
+        function validateSignUp(event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            registerUser(username, password, email);
+        }
+
+        async function registerUser(username, password, email) {
+            var jsonData = { "username": username, "password": password, "email": email };
+            var url = "register";
+
+            fetch(url, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            })
+                .then(response => { return response.json(); })
+                .then(result => {
+                    if (result.message === "registraton successful") {
+                        localStorage.setItem("logged-in", "yes");
+                        localStorage.setItem("user_id", result.user_id);
+                        window.location.assign("schedule.html"); // Redirect to schedule page
+                    } else {
+                        document.getElementById("username").value = "";
+                        document.getElementById("password").value = "";
+                        document.getElementById("email").value = "";
+                        alert(result.message);
+                    }
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="nav-bar">
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+    </div>
+
+    <form class="register-container" onsubmit="validateSignUp(event)">
+        <h2>Create Account</h2>
+        <input type="text" id="username" placeholder="Username" required><br>
+        <input type="email" id="email" placeholder="Email" required><br>
+        <input type="password" id="password" placeholder="Password" required><br>
+        <input type="submit" id="submit-button" value="Register">
+    </form>
+
+</body>
+
+</html>
