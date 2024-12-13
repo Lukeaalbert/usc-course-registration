@@ -20,41 +20,42 @@ function saveSchedule(){
     };
 
 	var classes = `${localStorage.getItem("user_id")}'s saved schedule at ${now.toLocaleString(undefined, options)}\n\n`;
-	
-	var div = document.getElementById('searchResults');
-	var divs = div.getElementsByTagName('div');
-	for (var i = 0; i < divs.length; i += 1) {
-		const element = divs[i];
-		if(element.childNodes[1].checked){
-            //console.log(db_data);
-			var courseDetails = db_data[i][Object.keys(db_data[i])[0]];
-			classes += courseDetails[1] + ": " + courseDetails[2] + "\n";
-			classes += courseDetails[5] + ", " + courseDetails[0] + "\n";
-			
-			// parse days
-			let days = "";
-		    for (let i = 0; i < courseDetails[6].length - 1; i++) {
-		    	if (courseDetails[6][i] == "H") {
-		    		days += "TH, ";
-		    	}
-		    	else {
-		    		days += courseDetails[6][i] + ", ";
-		    	}
-		    }
-		    if (courseDetails[6][courseDetails[6].length - 1] == "H") {
-	    		days += "TH";
-	    	}
-	    	else {
-	    		days += courseDetails[6][courseDetails[6].length - 1];
-	    	}
-			
-			classes += days + "; " + courseDetails[7];
-			classes += "\n\n";
-		}
-	  
-	}
+
 	//console.log(classes);
-	
+	document.querySelectorAll(".class-checkbox").forEach(box => {
+        // console.log(typeof box.id);
+        if(box.checked){
+            for(var i = 0; i < db_data.length; i ++){
+                var courseDetails = db_data[i][Object.keys(db_data[i])[0]];
+                if(courseDetails[0] === box.id){
+                    var courseDetails = db_data[i][Object.keys(db_data[i])[0]];
+                    classes += courseDetails[1] + ": " + courseDetails[2] + "\n";
+                    classes += courseDetails[5] + ", " + courseDetails[0] + "\n";
+                    
+                    // parse days
+                    let days = "";
+                    for (let i = 0; i < courseDetails[6].length - 1; i++) {
+                        if (courseDetails[6][i] == "H") {
+                            days += "TH, ";
+                        }
+                        else {
+                            days += courseDetails[6][i] + ", ";
+                        }
+                    }
+                    if (courseDetails[6][courseDetails[6].length - 1] == "H") {
+                        days += "TH";
+                    }
+                    else {
+                        days += courseDetails[6][courseDetails[6].length - 1];
+                    }
+                    
+                    classes += days + "; " + courseDetails[7];
+                    classes += "\n\n";
+                    break;
+                }
+            }
+        }
+    });
 	// Create a Blob containing the string "hello"
 	const blob = new Blob([classes], { type: "text/plain" });
 	
@@ -337,16 +338,13 @@ document.addEventListener("DOMContentLoaded", function() {
         //     '50429R', '50430R'];
 
         var wantedClasses = [];
-	
-        var div = document.getElementById('searchResults');
-        var divs = div.getElementsByTagName('div');
-        for (var i = 0; i < divs.length; i += 1) {
-            const element = divs[i];
-            if(element.childNodes[1].checked){
-                var sessionID = db_data[i][Object.keys(db_data[i])[0]][0];
-                wantedClasses.push(sessionID);
+
+        document.querySelectorAll(".class-checkbox").forEach(box => {
+            // console.log(typeof box.id);
+            if(box.checked){
+                wantedClasses.push(box.id);
             }
-        }
+        });
 
         optimizeSchedule(wantedClasses); 
     });
